@@ -16,12 +16,13 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
 
         CREATE TABLE IF NOT EXISTS music (
           id INTEGER NOT NULL PRIMARY KEY,
-          title TEXT NOT NULL,
-          artist TEXT NOT NULL,
+          title TEXT,
+          artist TEXT,
           album TEXT,
           duration INTEGER,
           year INTEGER,
-          genre TEXT,
+          date TEXT,
+          picture TEXT,
           file_path TEXT NOT NULL,
           play_count INTEGER DEFAULT 0,
           last_played_at TEXT,
@@ -63,6 +64,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
         INSERT INTO tag_type (name) VALUES ('場景');
         INSERT INTO tag_type (name) VALUES ('語言');
         INSERT INTO tag_type (name) VALUES ('年代');
+        INSERT INTO tag_type (name) VALUES ('其他');
 
         INSERT INTO tag (name, tag_type_id) VALUES ('古典', 1);
         INSERT INTO tag (name, tag_type_id) VALUES ('搖滾', 1);
@@ -98,6 +100,9 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
         INSERT INTO tag (name, tag_type_id) VALUES ('2000年代', 5);
         INSERT INTO tag (name, tag_type_id) VALUES ('2010年代', 5);
         INSERT INTO tag (name, tag_type_id) VALUES ('2020年代', 5);
+
+        INSERT INTO tag (name, tag_type_id) VALUES ('動漫', 6);
+        INSERT INTO tag (name, tag_type_id) VALUES ('電影', 6);
     `);
 
       currentDbVersion = 1;
