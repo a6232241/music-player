@@ -9,6 +9,11 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
     if (currentDbVersion === null || currentDbVersion >= DATABASE_VERSION) {
       return { success: true };
     }
+    // Clear all tables
+    // let tables = await db.getAllAsync<{ name: string }>("SELECT name FROM sqlite_master WHERE type='table';");
+    // for (let i = 0; i < tables.length; i++) {
+    //   await db.runAsync(`DROP TABLE IF EXISTS ${tables[i].name}`);
+    // }
 
     if (currentDbVersion === 0) {
       await db.execAsync(`
@@ -19,22 +24,40 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
           title TEXT,
           artist TEXT,
           album TEXT,
+          album_art TEXT,
+          lyrics TEXT,
           duration INTEGER,
           year INTEGER,
           date TEXT,
-          picture TEXT,
-          file_path TEXT NOT NULL,
-          play_count INTEGER DEFAULT 0,
-          last_played_at TEXT,
+          copyright TEXT,
+          file_url TEXT,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-          updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          is_temporary INTEGER DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS music_play (
+          id INTEGER NOT NULL PRIMARY KEY,
+          music_id INTEGER NOT NULL,
+          play_count INTEGER DEFAULT 0,
+          last_played_at TEXT NOT NULL,
+          is_temporary INTEGER DEFAULT 1,
+          FOREIGN KEY (music_id) REFERENCES music (id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS local_file_path (
+          id INTEGER NOT NULL PRIMARY KEY,
+          music_id INTEGER NOT NULL,
+          path TEXT NOT NULL,
+          FOREIGN KEY (music_id) REFERENCES music (id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS tag_type (
           id INTEGER NOT NULL PRIMARY KEY,
           name TEXT NOT NULL UNIQUE,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-          updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          is_temporary INTEGER DEFAULT 1
         );
 
         CREATE TABLE IF NOT EXISTS tag (
@@ -43,6 +66,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
           tag_type_id INTEGER NOT NULL,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
           updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          is_temporary INTEGER DEFAULT 1,
           FOREIGN KEY (tag_type_id) REFERENCES tag_type (id) ON DELETE SET NULL
         );
 
@@ -51,6 +75,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
           music_id INTEGER NOT NULL,
           tag_id INTEGER NOT NULL,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          is_temporary INTEGER DEFAULT 1,
           FOREIGN KEY (music_id) REFERENCES music (id) ON DELETE CASCADE,
           FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE,
           UNIQUE (music_id, tag_id)
