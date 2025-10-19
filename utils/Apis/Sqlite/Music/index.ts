@@ -33,7 +33,7 @@ class Music extends Config {
   }
   async postMusic(req: PostMusicRequire) {
     try {
-      await this.db.runAsync(
+      const result = await this.db.runAsync(
         `INSERT INTO music 
           (title, artist, album, album_art, lyrics, duration, year, date, copyright, file_url)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -50,8 +50,10 @@ class Music extends Config {
           req.fileUrl ?? null,
         ],
       );
+
+      return result.lastInsertRowId;
     } catch (error) {
-      console.log("Error posting music:", error);
+      console.error("Error posting music:", error);
     }
   }
 }
