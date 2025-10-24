@@ -28,4 +28,7 @@ type PostMusicRequire = Omit<MusicType, "id" | "createdAt" | "updateAt">;
 type GetMusicRequire = { id: number };
 type GetMusicResponse = MusicType;
 
-export { GetMusicRequire, GetMusicResponse, MusicType, PostMusicRequire };
+type GetMusicByTagRequire = { ids: number[] };
+type GetMusicByTagResponse = MusicType;
+
+export { GetMusicByTagRequire, GetMusicByTagResponse, GetMusicRequire, GetMusicResponse, MusicType, PostMusicRequire };

@@ -1,0 +1,18 @@
+import { Buffer } from "buffer";
+import * as FileSystem from "expo-file-system";
+import { IAudioMetadata, parseBuffer } from "music-metadata";
+
+const getMetadataFromUri = async (uri?: string | null): Promise<void | IAudioMetadata> => {
+  if (!uri) return;
+
+  try {
+    const base64Data = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
+    const buffer = Buffer.from(base64Data, "base64");
+    const metadata = await parseBuffer(buffer, { mimeType: "audio/mpeg" });
+    return metadata;
+  } catch (error) {
+    console.error("解析失敗:", error);
+  }
+};
+
+export { getMetadataFromUri };

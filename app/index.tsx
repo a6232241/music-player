@@ -1,11 +1,12 @@
 import AudioItem from "@/components/AudioItem";
+import TagFilter from "@/components/TagFilter";
 import Apis from "@/utils/Apis";
 import { GetMusicResponse, PostMusicRequire } from "@/utils/Apis/Sqlite/Music/type";
+import { getMetadataFromUri } from "@/utils/helper";
 import { Buffer } from "buffer";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
-import { IAudioMetadata, parseBuffer } from "music-metadata";
 import { useCallback, useEffect, useState } from "react";
 import { Button, FlatList, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,19 +16,7 @@ export default function Index() {
   const status = useAudioPlayerStatus(player);
   const [index, setIndex] = useState<number>(0);
   const [audios, setAudios] = useState<GetMusicResponse[]>([]);
-
-  const getMetadataFromUri = async (uri?: string | null): Promise<void | IAudioMetadata> => {
-    if (!uri) return;
-
-    try {
-      const base64Data = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
-      const buffer = Buffer.from(base64Data, "base64");
-      const metadata = await parseBuffer(buffer, { mimeType: "audio/mpeg" });
-      return metadata;
-    } catch (error) {
-      console.error("解析失敗:", error);
-    }
-  };
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
 
   const handlePress = () => {
     if (player.paused) player.play();
@@ -106,18 +95,32 @@ export default function Index() {
     }
   };
 
+  const handleSelectTagId = (id: number) => {
+    setSelectedTagIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
   useEffect(() => {
     try {
       (async () => {
-        const list = await Apis.sqlite?.music.getMusics();
+        let tagIds: number[] = [];
+        selectedTagIds.forEach((id) => tagIds.push(id));
+        const list =
+          tagIds.length === 0
+            ? await Apis.sqlite?.music.getMusics()
+            : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds });
         if (!list) throw new Error("Failed to get musics");
-        if (list[index].localFilePath) player.replace(list[index].localFilePath);
+        if (list[index]?.localFilePath) player.replace(list[index].localFilePath);
         setAudios(list);
       })();
     } catch (error) {
       console.error("Error getting musics:", error);
     }
-  }, [player, index]);
+  }, [player, index, selectedTagIds]);
 
   useEffect(() => {
     player.seekTo(0);
@@ -128,6 +131,7 @@ export default function Index() {
   return (
     <>
       <SafeAreaView style={{ flex: 1 }} edges={["right", "left", "bottom"]}>
+        <TagFilter selected={selectedTagIds} onPress={handleSelectTagId} />
         <FlatList
           data={audios}
           keyExtractor={(_, index) => index.toString()}
