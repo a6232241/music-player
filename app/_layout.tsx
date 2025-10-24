@@ -37,7 +37,12 @@ export default function RootLayout() {
           <Text>Loading...</Text>
         </SafeAreaView>
       )}
-      {!isDbLoading && <Stack />}
+      {!isDbLoading && (
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="upload" />
+        </Stack>
+      )}
     </SafeAreaProvider>
   );
 }
