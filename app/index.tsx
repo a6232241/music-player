@@ -1,19 +1,20 @@
 import AudioItem from "@/components/AudioItem";
 import Apis from "@/utils/Apis";
+import { GetMusicResponse, PostMusicRequire } from "@/utils/Apis/Sqlite/Music/type";
 import { Buffer } from "buffer";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
-import { IAudioMetadata, ICommonTagsResult, parseBuffer } from "music-metadata";
-import { useCallback, useState } from "react";
+import { IAudioMetadata, parseBuffer } from "music-metadata";
+import { useCallback, useEffect, useState } from "react";
 import { Button, FlatList, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
-  const [audioMetaCommons, setAudioMetaCommons] = useState<ICommonTagsResult[]>([]);
   const player = useAudioPlayer();
   const status = useAudioPlayerStatus(player);
   const [index, setIndex] = useState<number>(0);
+  const [audios, setAudios] = useState<GetMusicResponse[]>([]);
 
   const getMetadataFromUri = async (uri?: string | null): Promise<void | IAudioMetadata> => {
     if (!uri) return;
@@ -35,33 +36,16 @@ export default function Index() {
 
   const handleAudioItemPress = useCallback(
     (_index: number) => {
+      if (!audios[_index]?.localFilePath) return;
+
+      player.replace(audios[_index]?.localFilePath);
       player.seekTo(0);
-      // player.replace(audios[_index]);
-      player.play();
       setIndex(_index);
+      // replace 需要加載，因此設定延遲，避免播放失效
+      setTimeout(() => player.play(), 300);
     },
-    [player],
+    [player, audios],
   );
-
-  // useEffect(() => {
-  //   (async () => {
-  //     let metadataCommons: ICommonTagsResult[] = [];
-  //     for (const asset of assets ?? []) {
-  //       let metadata = await getMetadataFromUri(asset.localUri);
-  //       if (metadata?.common) metadataCommons.push(metadata.common);
-  //     }
-  //     setAudioMetaCommons(metadataCommons);
-  //   })();
-  // }, [assets]);
-
-  // useEffect(() => {
-  //   // 由於執行 handleAudioItemPress 後，index 發生改變，但 didJustFinish 可能依舊為 true 的情況
-  //   // 因此補上 seekTo(0)，確保 didJustFinish = false
-  //   player.seekTo(0);
-  //   if (!status.didJustFinish || index >= audios.length - 1) return;
-
-  //   handleAudioItemPress(index + 1);
-  // }, [status.didJustFinish, index, handleAudioItemPress, player]);
 
   const handleUploadFile = async () => {
     try {
@@ -82,8 +66,9 @@ export default function Index() {
       });
 
       const meta = await getMetadataFromUri(uri);
+      if (!meta) throw new Error("Failed to get metadata");
 
-      const musicId = await Apis.sqlite?.music.postMusic({
+      const audioInfo: PostMusicRequire = {
         title: meta?.common?.title,
         artist: meta?.common?.artist,
         album: meta?.common?.album,
@@ -96,8 +81,20 @@ export default function Index() {
         year: meta?.common?.year,
         date: meta?.common?.date,
         copyright: meta?.common?.copyright,
-      });
+      };
 
+      setAudios((prev) => [
+        ...prev,
+        {
+          ...audioInfo,
+          id: new Date().getTime(),
+          createdAt: new Date(),
+          updateAt: new Date(),
+          localFilePath: destinationUri,
+        },
+      ]);
+
+      const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
       if (!musicId) throw new Error("Failed to post music");
 
       await Apis.sqlite?.localFilePath.postLocalFilePath({
@@ -109,13 +106,32 @@ export default function Index() {
     }
   };
 
+  useEffect(() => {
+    try {
+      (async () => {
+        const list = await Apis.sqlite?.music.getMusics();
+        if (!list) throw new Error("Failed to get musics");
+        if (list[index].localFilePath) player.replace(list[index].localFilePath);
+        setAudios(list);
+      })();
+    } catch (error) {
+      console.error("Error getting musics:", error);
+    }
+  }, [player, index]);
+
+  useEffect(() => {
+    player.seekTo(0);
+    if (!status.didJustFinish || index >= audios.length - 1) return;
+    handleAudioItemPress(index + 1);
+  }, [status.didJustFinish, index, handleAudioItemPress, player, audios.length]);
+
   return (
     <>
       <SafeAreaView style={{ flex: 1 }} edges={["right", "left", "bottom"]}>
         <FlatList
-          data={audioMetaCommons}
+          data={audios}
           keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item, index }) => <AudioItem metaCommon={item} onPress={() => handleAudioItemPress(index)} />}
+          renderItem={({ item, index }) => <AudioItem data={item} onPress={() => handleAudioItemPress(index)} />}
           contentContainerStyle={{ gap: 5 }}
         />
         <Text>Playing: {status.playing ? "Yes" : "No"}</Text>

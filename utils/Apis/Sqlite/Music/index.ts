@@ -56,6 +56,36 @@ class Music extends Config {
       console.error("Error posting music:", error);
     }
   }
+
+  async getMusics(): Promise<GetMusicResponse[]> {
+    try {
+      const result = await this.db.getAllAsync<GetMusicResponse>(
+        `
+          SELECT
+            music.id,
+            title,
+            artist,
+            album,
+            album_art AS albumArt,
+            lyrics,
+            duration,
+            year,
+            date,
+            copyright,
+            file_url AS fileUrl,
+            created_at AS createdAt,
+            updated_at AS updateAt,
+            local_file_path.path AS localFilePath
+          FROM music LEFT JOIN local_file_path ON music.id = local_file_path.music_id
+        `,
+      );
+      if (!result) return [];
+      return result as GetMusicResponse[];
+    } catch (error) {
+      console.error("Error getting musics:", error);
+      return [];
+    }
+  }
 }
 
 export default Music;

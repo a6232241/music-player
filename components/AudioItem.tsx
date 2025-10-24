@@ -1,15 +1,14 @@
-import { Buffer } from "buffer";
+import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
 import { Image } from "expo-image";
-import { ICommonTagsResult } from "music-metadata";
 import React from "react";
 import { Button, Text, View } from "react-native";
 
 type Props = {
-  metaCommon: ICommonTagsResult;
+  data: GetMusicResponse;
   onPress: () => void;
 };
 
-const AudioItem: React.FC<Props> = ({ metaCommon, onPress }) => {
+const AudioItem: React.FC<Props> = ({ data, onPress }) => {
   return (
     <>
       <View
@@ -22,15 +21,8 @@ const AudioItem: React.FC<Props> = ({ metaCommon, onPress }) => {
           backgroundColor: "white",
         }}>
         <Button title="Play" onPress={onPress} />
-        <Image
-          style={{ height: "100%", aspectRatio: 1 }}
-          source={
-            metaCommon?.picture
-              ? `data:${metaCommon.picture[0].format};base64,${Buffer.from(metaCommon.picture[0].data).toString("base64")}`
-              : undefined
-          }
-        />
-        <Text>{metaCommon?.title}</Text>
+        <Image style={{ height: "100%", aspectRatio: 1 }} source={data?.albumArt} />
+        <Text>{data?.title ?? ""}</Text>
       </View>
     </>
   );
