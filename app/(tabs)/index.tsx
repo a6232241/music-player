@@ -1,4 +1,5 @@
 import AudioItem from "@/components/AudioItem";
+import SortSelect, { SortType } from "@/components/SortSelect";
 import TagFilter from "@/components/TagFilter";
 import Apis from "@/utils/Apis";
 import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
@@ -14,6 +15,7 @@ export default function Index() {
   const [index, setIndex] = useState<number>(0);
   const [audios, setAudios] = useState<GetMusicResponse[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
+  const [sort, setSort] = useState<SortType>(SortType.DEFAULT);
 
   const handlePress = () => {
     if (player.paused) player.play();
@@ -40,6 +42,33 @@ export default function Index() {
       else newSet.add(id);
       return newSet;
     });
+  };
+
+  const handleSortSelectPress = (index?: number | undefined) => {
+    switch (index) {
+      case SortType.DATE_ASC:
+        setAudios((prev) =>
+          [...prev].sort((a, b) => {
+            if (a.date && b.date) return new Date(a.date).getTime() - new Date(b.date).getTime();
+            return 1;
+          }),
+        );
+        setSort(SortType.DATE_ASC);
+        break;
+      case SortType.DATE_DESC:
+        setAudios((prev) =>
+          [...prev].sort((a, b) => {
+            if (a.date && b.date) return new Date(b.date).getTime() - new Date(a.date).getTime();
+            return 1;
+          }),
+        );
+        setSort(SortType.DATE_DESC);
+        break;
+      default:
+        setAudios((prev) => [...prev].sort((a, b) => a.id - b.id));
+        setSort(SortType.DEFAULT);
+        break;
+    }
   };
 
   useFocusEffect(
@@ -72,6 +101,7 @@ export default function Index() {
     <>
       <SafeAreaView style={{ flex: 1 }}>
         <TagFilter selected={selectedTagIds} onPress={handleSelectTagId} />
+        <SortSelect selected={sort} onPress={handleSortSelectPress} />
         <FlatList
           data={audios}
           keyExtractor={(_, index) => index.toString()}
