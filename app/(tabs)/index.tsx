@@ -12,10 +12,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Index() {
   const player = useAudioPlayer();
   const status = useAudioPlayerStatus(player);
-  const [index, setIndex] = useState<number>(0);
   const [audios, setAudios] = useState<GetMusicResponse[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
   const [sort, setSort] = useState<SortType>(SortType.DEFAULT);
+  const [audioId, setAudioId] = useState<number>();
 
   const handlePress = () => {
     if (player.paused) player.play();
@@ -28,7 +28,7 @@ export default function Index() {
 
       player.replace(audios[_index]?.localFilePath);
       player.seekTo(0);
-      setIndex(_index);
+      setAudioId(audios[_index].id);
       // replace 需要加載，因此設定延遲，避免播放失效
       setTimeout(() => player.play(), 300);
     },
@@ -82,20 +82,22 @@ export default function Index() {
               ? await Apis.sqlite?.music.getMusics()
               : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds });
           if (!list) throw new Error("Failed to get musics");
-          if (list[index]?.localFilePath) player.replace(list[index].localFilePath);
+          if (list[0]?.localFilePath) player.replace(list[0].localFilePath);
           setAudios(list);
+          setAudioId(list[0]?.id);
         })();
       } catch (error) {
         console.error("Error getting musics:", error);
       }
-    }, [player, index, selectedTagIds]),
+    }, [player, selectedTagIds]),
   );
 
   useEffect(() => {
+    const currentIndex = audioId ? audios.findIndex((audio) => audio.id === audioId) : audios[0]?.id;
+    if (!status.didJustFinish || currentIndex >= audios.length - 1) return;
     player.seekTo(0);
-    if (!status.didJustFinish || index >= audios.length - 1) return;
-    handleAudioItemPress(index + 1);
-  }, [status.didJustFinish, index, handleAudioItemPress, player, audios.length]);
+    handleAudioItemPress(currentIndex + 1);
+  }, [status.didJustFinish, handleAudioItemPress, player, audios, audioId]);
 
   return (
     <>
