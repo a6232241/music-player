@@ -1,9 +1,11 @@
+import { SortType } from "@/components/SortSelect";
 import Config from "../Config";
 import {
   GetMusicByTagRequire,
   GetMusicByTagResponse,
   GetMusicRequire,
   GetMusicResponse,
+  GetMusicsRequire,
   PostMusicRequire,
 } from "./type";
 
@@ -63,7 +65,18 @@ class Music extends Config {
     }
   }
 
-  async getMusics(): Promise<GetMusicResponse[]> {
+  async getMusics(req?: GetMusicsRequire): Promise<GetMusicResponse[]> {
+    let sortSQL = "";
+    if (req?.sortType === SortType.DEFAULT) {
+      sortSQL = `ORDER BY music.id ASC`;
+    }
+    if (req?.sortType === SortType.DATE_ASC) {
+      sortSQL = `ORDER BY date ASC`;
+    }
+    if (req?.sortType === SortType.DATE_DESC) {
+      sortSQL = `ORDER BY date DESC`;
+    }
+
     try {
       const result = await this.db.getAllAsync<GetMusicResponse>(
         `
@@ -82,7 +95,7 @@ class Music extends Config {
             created_at AS createdAt,
             updated_at AS updateAt,
             local_file_path.path AS localFilePath
-          FROM music LEFT JOIN local_file_path ON music.id = local_file_path.music_id
+          FROM music LEFT JOIN local_file_path ON music.id = local_file_path.music_id ${sortSQL}
         `,
       );
       if (!result) return [];
@@ -96,6 +109,17 @@ class Music extends Config {
   async getMusicsByTagIds(req: GetMusicByTagRequire): Promise<GetMusicByTagResponse[]> {
     let result: GetMusicByTagResponse[] = [];
     const placeholders = req.ids.map(() => "?").join(",");
+    let sortSQL = "";
+    if (req?.sortType === SortType.DEFAULT) {
+      sortSQL = `ORDER BY music.id ASC`;
+    }
+    if (req?.sortType === SortType.DATE_ASC) {
+      sortSQL = `ORDER BY date ASC`;
+    }
+    if (req?.sortType === SortType.DATE_DESC) {
+      sortSQL = `ORDER BY date DESC`;
+    }
+
     try {
       result = await this.db.getAllAsync<GetMusicByTagResponse>(
         `
@@ -125,7 +149,7 @@ class Music extends Config {
             HAVING COUNT(DISTINCT tag.id) = ${req.ids.length}
           ) AS filtered_musics
           INNER JOIN music ON filtered_musics.id = music.id
-          LEFT JOIN local_file_path ON music.id = local_file_path.music_id
+          LEFT JOIN local_file_path ON music.id = local_file_path.music_id ${sortSQL}
         `,
         req.ids,
       );

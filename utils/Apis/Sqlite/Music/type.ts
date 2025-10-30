@@ -1,3 +1,5 @@
+import { SortType } from "@/components/SortSelect";
+
 type OnlyLocalType = {
   isTemporary?: boolean;
 };
@@ -28,7 +30,19 @@ type PostMusicRequire = Omit<MusicType, "id" | "createdAt" | "updateAt">;
 type GetMusicRequire = { id: number };
 type GetMusicResponse = MusicType;
 
-type GetMusicByTagRequire = { ids: number[] };
+type GetMusicByTagRequire = { ids: number[]; sortType?: SortType };
 type GetMusicByTagResponse = MusicType;
 
-export { GetMusicByTagRequire, GetMusicByTagResponse, GetMusicRequire, GetMusicResponse, MusicType, PostMusicRequire };
+type GetMusicsRequire = {
+  sortType?: SortType;
+};
+
+export {
+  GetMusicByTagRequire,
+  GetMusicByTagResponse,
+  GetMusicRequire,
+  GetMusicResponse,
+  GetMusicsRequire,
+  MusicType,
+  PostMusicRequire,
+};

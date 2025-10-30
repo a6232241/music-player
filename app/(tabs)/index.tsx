@@ -14,7 +14,7 @@ export default function Index() {
   const status = useAudioPlayerStatus(player);
   const [audios, setAudios] = useState<GetMusicResponse[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
-  const [sort, setSort] = useState<SortType>(SortType.DEFAULT);
+  const [selectedSortType, setSelectedSortType] = useState<SortType>(SortType.DEFAULT);
   const [audioId, setAudioId] = useState<number>();
 
   const handlePress = () => {
@@ -24,10 +24,12 @@ export default function Index() {
 
   const handleAudioItemPress = useCallback(
     (_index: number) => {
+      // replace 需要加載，因此設定播放時間重置，避免進入下一首音樂時，播放狀態尚未改變，導致播放時間錯誤
+      player.seekTo(0);
+
       if (!audios[_index]?.localFilePath) return;
 
       player.replace(audios[_index]?.localFilePath);
-      player.seekTo(0);
       setAudioId(audios[_index].id);
       // replace 需要加載，因此設定延遲，避免播放失效
       setTimeout(() => player.play(), 300);
@@ -44,29 +46,16 @@ export default function Index() {
     });
   };
 
-  const handleSortSelectPress = (index?: number | undefined) => {
+  const handleSelectSortType = (index?: number | undefined) => {
     switch (index) {
       case SortType.DATE_ASC:
-        setAudios((prev) =>
-          [...prev].sort((a, b) => {
-            if (a.date && b.date) return new Date(a.date).getTime() - new Date(b.date).getTime();
-            return 1;
-          }),
-        );
-        setSort(SortType.DATE_ASC);
+        setSelectedSortType(SortType.DATE_ASC);
         break;
       case SortType.DATE_DESC:
-        setAudios((prev) =>
-          [...prev].sort((a, b) => {
-            if (a.date && b.date) return new Date(b.date).getTime() - new Date(a.date).getTime();
-            return 1;
-          }),
-        );
-        setSort(SortType.DATE_DESC);
+        setSelectedSortType(SortType.DATE_DESC);
         break;
       default:
-        setAudios((prev) => [...prev].sort((a, b) => a.id - b.id));
-        setSort(SortType.DEFAULT);
+        setSelectedSortType(SortType.DEFAULT);
         break;
     }
   };
@@ -75,27 +64,27 @@ export default function Index() {
     useCallback(() => {
       try {
         (async () => {
-          let tagIds: number[] = [];
-          selectedTagIds.forEach((id) => tagIds.push(id));
+          let tagIds = Array.from(selectedTagIds);
           const list =
-            tagIds.length === 0
-              ? await Apis.sqlite?.music.getMusics()
-              : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds });
+            !tagIds || tagIds.length === 0
+              ? await Apis.sqlite?.music.getMusics({ sortType: selectedSortType })
+              : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds, sortType: selectedSortType });
           if (!list) throw new Error("Failed to get musics");
-          if (list[0]?.localFilePath) player.replace(list[0].localFilePath);
+          if (list[0]?.localFilePath && !player.playing) {
+            player.replace(list[0].localFilePath);
+            setAudioId(list[0]?.id);
+          }
           setAudios(list);
-          setAudioId(list[0]?.id);
         })();
       } catch (error) {
         console.error("Error getting musics:", error);
       }
-    }, [player, selectedTagIds]),
+    }, [player, selectedTagIds, selectedSortType]),
   );
 
   useEffect(() => {
     const currentIndex = audioId ? audios.findIndex((audio) => audio.id === audioId) : audios[0]?.id;
-    if (!status.didJustFinish || currentIndex >= audios.length - 1) return;
-    player.seekTo(0);
+    if (!status.didJustFinish || audios.length === 0 || currentIndex >= audios.length - 1) return;
     handleAudioItemPress(currentIndex + 1);
   }, [status.didJustFinish, handleAudioItemPress, player, audios, audioId]);
 
@@ -103,7 +92,7 @@ export default function Index() {
     <>
       <SafeAreaView style={{ flex: 1 }}>
         <TagFilter selected={selectedTagIds} onPress={handleSelectTagId} />
-        <SortSelect selected={sort} onPress={handleSortSelectPress} />
+        <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
         <FlatList
           data={audios}
           keyExtractor={(_, index) => index.toString()}
