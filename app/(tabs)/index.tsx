@@ -1,12 +1,12 @@
 import AudioItem from "@/components/AudioItem";
 import SortSelect, { SortType } from "@/components/SortSelect";
-import TagFilter from "@/components/TagFilter";
+import TagMultiSelect from "@/components/TagMultiSelect";
 import Apis from "@/utils/Apis";
 import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Button, FlatList, Text } from "react-native";
+import { Button, FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -90,8 +90,11 @@ export default function Index() {
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1 }}>
-        <TagFilter selected={selectedTagIds} onPress={handleSelectTagId} />
+      <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1, gap: 20 }}>
+        <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
+
+        <View style={{ flex: 1, gap: 10 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 20 }}>列表</Text>
         <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
         <FlatList
           data={audios}
@@ -99,11 +102,14 @@ export default function Index() {
           renderItem={({ item, index }) => <AudioItem data={item} onPress={() => handleAudioItemPress(index)} />}
           contentContainerStyle={{ gap: 5 }}
         />
+          <View>
         <Text>Playing: {status.playing ? "Yes" : "No"}</Text>
         <Text>Current Time: {status.currentTime}s</Text>
         <Text>Duration: {status.duration}s</Text>
         <Text>didJustFinish: {status.didJustFinish ? "true" : "false"}</Text>
         <Button title="Play / Pause" onPress={handlePress} />
+          </View>
+        </View>
       </SafeAreaView>
     </>
   );

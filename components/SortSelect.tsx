@@ -32,7 +32,7 @@ const SortSelect: React.FC<Props> = ({ selected, onPress }: Props) => {
 
   return (
     <>
-      <View style={{ flexDirection: "row", justifyContent: "flex-end", padding: 10 }}>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
         <TouchableOpacity onPress={handlePress} style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
           <FontAwesome name="sort" size={24} color="black" />
           <Text>{options[selected]}</Text>
