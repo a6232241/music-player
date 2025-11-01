@@ -1,3 +1,4 @@
+import TagMultiSelect from "@/components/TagMultiSelect";
 import Apis from "@/utils/Apis";
 import { PostMusicRequire } from "@/utils/Apis/Sqlite/Music/type";
 import { getMetadataFromUri } from "@/utils/helper";
@@ -5,23 +6,26 @@ import { Buffer } from "buffer";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useState } from "react";
-import { ActivityIndicator, Button } from "react-native";
+import { ActivityIndicator, Button, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const UploadScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
   const handleUploadFile = async () => {
     try {
       setIsLoading(true);
       const result = await DocumentPicker.getDocumentAsync({
         type: "audio/mpeg",
         copyToCacheDirectory: true,
-        multiple: false,
+        multiple: true,
       });
 
       if (result.canceled || result.assets.length === 0) throw new Error("No file selected");
 
-      const { uri, name } = result.assets[0];
+      await Promise.allSettled(
+        result.assets.map(async (asset) => {
+          const { uri, name } = asset;
       const destinationUri = FileSystem.documentDirectory + name;
 
       await FileSystem.copyAsync({
@@ -49,10 +53,14 @@ const UploadScreen = () => {
       const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
       if (!musicId) throw new Error("Failed to post music");
 
-      await Apis.sqlite?.localFilePath.postLocalFilePath({
-        id: musicId,
-        path: destinationUri,
+          if (selectedTagIds.size > 0) {
+            Apis.sqlite?.musicTag.postMusicTags({
+              musicId,
+              tagIds: Array.from(selectedTagIds),
       });
+          }
+        }),
+      );
     } catch (error) {
       console.error("File upload error:", error);
     } finally {
@@ -60,10 +68,22 @@ const UploadScreen = () => {
     }
   };
 
+  const handleSelectTagId = (id: number) => {
+    setSelectedTagIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
   return (
     <>
-      <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, alignItems: "center" }}>
+        <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload Audio" onPress={handleUploadFile} />}
+        </View>
       </SafeAreaView>
     </>
   );
