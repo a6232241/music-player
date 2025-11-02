@@ -3,6 +3,7 @@ import SortSelect, { SortType } from "@/components/SortSelect";
 import TagMultiSelect from "@/components/TagMultiSelect";
 import Apis from "@/utils/Apis";
 import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
+import { getDocumentFile } from "@/utils/helper";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -23,13 +24,14 @@ export default function Index() {
   };
 
   const handleAudioItemPress = useCallback(
-    (_index: number) => {
+    async (_index: number) => {
       // replace 需要加載，因此設定播放時間重置，避免進入下一首音樂時，播放狀態尚未改變，導致播放時間錯誤
       player.seekTo(0);
 
-      if (!audios[_index]?.localFilePath) return;
+      const filePath = await getDocumentFile(audios[_index].fileName);
+      if (!filePath) return;
 
-      player.replace(audios[_index]?.localFilePath);
+      player.replace(filePath);
       setAudioId(audios[_index].id);
       // replace 需要加載，因此設定延遲，避免播放失效
       setTimeout(() => player.play(), 300);
@@ -70,9 +72,12 @@ export default function Index() {
               ? await Apis.sqlite?.music.getMusics({ sortType: selectedSortType })
               : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds, sortType: selectedSortType });
           if (!list) throw new Error("Failed to get musics");
-          if (list[0]?.localFilePath && !player.playing) {
-            player.replace(list[0].localFilePath);
-            setAudioId(list[0]?.id);
+          if (list.length > 0 && !player.playing) {
+            const filePath = await getDocumentFile(list[0].fileName);
+            if (filePath) {
+              player.replace(filePath);
+              setAudioId(list[0]?.id);
+            }
           }
           setAudios(list);
         })();
@@ -95,19 +100,19 @@ export default function Index() {
 
         <View style={{ flex: 1, gap: 10 }}>
           <Text style={{ fontWeight: "bold", fontSize: 20 }}>列表</Text>
-        <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
-        <FlatList
-          data={audios}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item, index }) => <AudioItem data={item} onPress={() => handleAudioItemPress(index)} />}
-          contentContainerStyle={{ gap: 5 }}
-        />
+          <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
+          <FlatList
+            data={audios}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item, index }) => <AudioItem data={item} onPress={() => handleAudioItemPress(index)} />}
+            contentContainerStyle={{ gap: 5 }}
+          />
           <View>
-        <Text>Playing: {status.playing ? "Yes" : "No"}</Text>
-        <Text>Current Time: {status.currentTime}s</Text>
-        <Text>Duration: {status.duration}s</Text>
-        <Text>didJustFinish: {status.didJustFinish ? "true" : "false"}</Text>
-        <Button title="Play / Pause" onPress={handlePress} />
+            <Text>Playing: {status.playing ? "Yes" : "No"}</Text>
+            <Text>Current Time: {status.currentTime}s</Text>
+            <Text>Duration: {status.duration}s</Text>
+            <Text>didJustFinish: {status.didJustFinish ? "true" : "false"}</Text>
+            <Button title="Play / Pause" onPress={handlePress} />
           </View>
         </View>
       </SafeAreaView>

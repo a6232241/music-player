@@ -4,10 +4,6 @@ type OnlyLocalType = {
   isTemporary?: boolean;
 };
 
-type LocalFilePathType = {
-  localFilePath?: string;
-};
-
 type MusicType = {
   id: number;
   title?: string;
@@ -20,10 +16,10 @@ type MusicType = {
   date?: string;
   copyright?: string;
   fileUrl?: string;
+  fileName: string;
   createdAt: Date;
   updateAt: Date;
-} & OnlyLocalType &
-  LocalFilePathType;
+} & OnlyLocalType;
 
 type PostMusicRequire = Omit<MusicType, "id" | "createdAt" | "updateAt">;
 

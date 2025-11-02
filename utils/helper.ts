@@ -15,4 +15,16 @@ const getMetadataFromUri = async (uri?: string | null): Promise<void | IAudioMet
   }
 };
 
-export { getMetadataFromUri };
+const getDocumentFile = async (fileName: string): Promise<string | null> => {
+  try {
+    const destinationUri = FileSystem.documentDirectory + fileName;
+    const info = await FileSystem.getInfoAsync(destinationUri);
+    if (!info.exists || info.size <= 0) return null;
+    return destinationUri;
+  } catch (error) {
+    console.error("Error getting document file:", error);
+    return null;
+  }
+};
+
+export { getDocumentFile, getMetadataFromUri };

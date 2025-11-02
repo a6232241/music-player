@@ -26,38 +26,39 @@ const UploadScreen = () => {
       await Promise.allSettled(
         result.assets.map(async (asset) => {
           const { uri, name } = asset;
-      const destinationUri = FileSystem.documentDirectory + name;
+          const destinationUri = FileSystem.documentDirectory + name;
 
-      await FileSystem.copyAsync({
-        from: uri,
-        to: destinationUri,
-      });
+          await FileSystem.copyAsync({
+            from: uri,
+            to: destinationUri,
+          });
 
-      const meta = await getMetadataFromUri(uri);
-      if (!meta) throw new Error("Failed to get metadata");
+          const meta = await getMetadataFromUri(uri);
+          if (!meta) throw new Error("Failed to get metadata");
 
-      const audioInfo: PostMusicRequire = {
-        title: meta?.common?.title,
-        artist: meta?.common?.artist,
-        album: meta?.common?.album,
-        albumArt:
-          meta?.common?.picture?.[0]?.data && meta?.common?.picture?.[0]?.format
-            ? `data:${meta.common.picture[0].format};base64,${Buffer.from(meta.common.picture[0].data).toString("base64")}`
-            : undefined,
-        lyrics: meta?.common?.lyrics?.[0]?.text,
-        duration: meta?.format?.duration,
-        year: meta?.common?.year,
-        date: meta?.common?.date,
-        copyright: meta?.common?.copyright,
-      };
-      const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
-      if (!musicId) throw new Error("Failed to post music");
+          const audioInfo: PostMusicRequire = {
+            title: meta?.common?.title,
+            artist: meta?.common?.artist,
+            album: meta?.common?.album,
+            albumArt:
+              meta?.common?.picture?.[0]?.data && meta?.common?.picture?.[0]?.format
+                ? `data:${meta.common.picture[0].format};base64,${Buffer.from(meta.common.picture[0].data).toString("base64")}`
+                : undefined,
+            lyrics: meta?.common?.lyrics?.[0]?.text,
+            duration: meta?.format?.duration,
+            year: meta?.common?.year,
+            date: meta?.common?.date,
+            copyright: meta?.common?.copyright,
+            fileName: name,
+          };
+          const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
+          if (!musicId) throw new Error("Failed to post music");
 
           if (selectedTagIds.size > 0) {
             Apis.sqlite?.musicTag.postMusicTags({
               musicId,
               tagIds: Array.from(selectedTagIds),
-      });
+            });
           }
         }),
       );
@@ -82,7 +83,7 @@ const UploadScreen = () => {
       <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, alignItems: "center" }}>
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload Audio" onPress={handleUploadFile} />}
+          {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload Audio" onPress={handleUploadFile} />}
         </View>
       </SafeAreaView>
     </>

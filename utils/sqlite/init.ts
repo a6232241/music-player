@@ -31,6 +31,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
           date TEXT,
           copyright TEXT,
           file_url TEXT,
+          file_name TEXT NOT NULL,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
           updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
           is_temporary INTEGER DEFAULT 1
@@ -42,13 +43,6 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
           play_count INTEGER DEFAULT 0,
           last_played_at TEXT NOT NULL,
           is_temporary INTEGER DEFAULT 1,
-          FOREIGN KEY (music_id) REFERENCES music (id) ON DELETE CASCADE
-        );
-
-        CREATE TABLE IF NOT EXISTS local_file_path (
-          id INTEGER NOT NULL PRIMARY KEY,
-          music_id INTEGER NOT NULL,
-          path TEXT NOT NULL,
           FOREIGN KEY (music_id) REFERENCES music (id) ON DELETE CASCADE
         );
 
