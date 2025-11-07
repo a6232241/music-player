@@ -28,7 +28,7 @@ export default function Index() {
       // replace 需要加載，因此設定播放時間重置，避免進入下一首音樂時，播放狀態尚未改變，導致播放時間錯誤
       player.seekTo(0);
 
-      const filePath = await getDocumentFile(audios[_index].fileName);
+      const filePath = (await getDocumentFile(audios[_index].fileName))?.uri;
       if (!filePath) return;
 
       player.replace(filePath);
@@ -73,7 +73,7 @@ export default function Index() {
               : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds, sortType: selectedSortType });
           if (!list) throw new Error("Failed to get musics");
           if (list.length > 0 && !player.playing) {
-            const filePath = await getDocumentFile(list[0].fileName);
+            const filePath = (await getDocumentFile(list[0].fileName))?.uri;
             if (filePath) {
               player.replace(filePath);
               setAudioId(list[0]?.id);
