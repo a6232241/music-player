@@ -1,3 +1,4 @@
+import Apis from "@/utils/Apis";
 import { getDocumentFile } from "@/utils/helper";
 import * as FileSystem from "expo-file-system";
 import { Link } from "expo-router";
@@ -9,19 +10,10 @@ const dbPath = "SQLite/main.db";
 const ProfileScreen = () => {
   const handleBackupSqliteDB = async () => {
     try {
-      const filePath = await getDocumentFile(dbPath);
-      console.log(filePath);
-      if (!filePath || !filePath.uri) throw new Error("No file selected");
+      const file = await getDocumentFile(dbPath);
+      if (!file || !file.uri) throw new Error("No file selected");
 
-      const response = await FileSystem.uploadAsync(`http://localhost:3000/backup`, filePath.uri, {
-        fieldName: "file",
-        httpMethod: "POST",
-        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-      });
-      const responseData = response?.body ? JSON.parse(response?.body) : null;
-      if (responseData?.isError) throw new Error(responseData?.message);
-
-      console.log("Upload successful:", responseData?.message);
+      await Apis.file.postFile("backup", file);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -29,11 +21,7 @@ const ProfileScreen = () => {
 
   const handleRestoreSqliteDB = async () => {
     try {
-      const savePath = FileSystem.documentDirectory + dbPath;
-      const response = await FileSystem.downloadAsync("http://localhost:3000/backup/main.db", savePath);
-      if (response?.status !== 200) throw new Error("Failed to download file");
-
-      console.log("Download successful:", response);
+      await Apis.file.getFile("backup/main.db", FileSystem.documentDirectory + dbPath);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
