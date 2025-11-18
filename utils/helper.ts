@@ -15,9 +15,9 @@ const getMetadataFromUri = async (uri?: string | null): Promise<void | IAudioMet
   }
 };
 
-const getDocumentFile = async (fileName: string): Promise<FileSystem.FileInfo | null> => {
+const getDocumentFile = async (path: string): Promise<FileSystem.FileInfo | null> => {
   try {
-    const destinationUri = FileSystem.documentDirectory + fileName;
+    const destinationUri = FileSystem.documentDirectory + path;
     const info = await FileSystem.getInfoAsync(destinationUri);
     if (!info.exists || info.size <= 0) return null;
     return info;
