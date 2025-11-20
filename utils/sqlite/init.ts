@@ -1,13 +1,13 @@
 import { SQLiteDatabase } from "expo-sqlite";
 
-export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: boolean }> {
+export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: boolean }> {
   try {
     const DATABASE_VERSION = 1;
     let currentDbVersion =
       (await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version"))?.user_version ?? null;
 
     if (currentDbVersion === null || currentDbVersion >= DATABASE_VERSION) {
-      return { success: true };
+      return { isError: false };
     }
     // Clear all tables
     // let tables = await db.getAllAsync<{ name: string }>("SELECT name FROM sqlite_master WHERE type='table';");
@@ -130,7 +130,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ success: 
     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
   } catch (error) {
     console.error("Error during database migration:", error);
-    return { success: false };
+    return { isError: true };
   }
-  return { success: true };
+  return { isError: false };
 }

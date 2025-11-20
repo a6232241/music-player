@@ -16,16 +16,19 @@ export default function RootLayout() {
 
   useEffect(() => {
     (async () => {
-      const dbInitResult = await Apis.init();
-      if (!dbInitResult.success) {
-        console.error("Failed to initialize the database.");
-        return;
-      }
-      setIsDbLoading(false);
-      await SplashScreen.hideAsync();
+      try {
+        const dbInitResult = await Apis.init();
+        if (!dbInitResult) {
+          throw new Error("Failed to initialize the database");
+        }
 
-      const db = await SQLite.openDatabaseAsync("main.db");
-      setDb(db);
+        setDb(dbInitResult.db);
+      } catch (error) {
+        console.error("Error initializing the database:", error);
+      } finally {
+        setIsDbLoading(false);
+        await SplashScreen.hideAsync();
+      }
     })();
   }, []);
 

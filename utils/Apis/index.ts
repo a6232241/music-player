@@ -10,11 +10,26 @@ class Apis {
   file: File = new File(this.origin);
 
   async init() {
-    this.db = await SQLite.openDatabaseAsync("main.db");
-    const result = await migrateDbIfNeeded(this.db);
+    try {
+      this.db = await SQLite.openDatabaseAsync("main.db", { useNewConnection: true });
+      const result = await migrateDbIfNeeded(this.db);
+      this.sqlite = new Sqlite(this.db);
 
-    this.sqlite = new Sqlite(this.db);
-    return result;
+      return { ...result, db: this.db };
+    } catch (error) {
+      console.error("Error initializing the database:", error);
+    }
+  }
+
+  async reloadDb() {
+    try {
+      this.db = await SQLite.openDatabaseAsync("main.db", { useNewConnection: true });
+      this.sqlite = new Sqlite(this.db);
+
+      return { isError: false };
+    } catch (error) {
+      console.error("Error reloading the database:", error);
+    }
   }
 }
 

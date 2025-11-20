@@ -15,15 +15,21 @@ const ProfileScreen = () => {
 
       await Apis.file.postFile("backup", file);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Call handleBackupSqliteDB error:", error);
     }
   };
 
   const handleRestoreSqliteDB = async () => {
     try {
-      await Apis.file.getFile("backup/main.db", FileSystem.documentDirectory + dbPath);
+      const response = await Apis.file.getFile("backup/main.db", `${FileSystem.documentDirectory}${dbPath}`);
+      if (!response?.uri) throw new Error("No file selected");
+
+      await FileSystem.deleteAsync(`${response.uri}-wal`, { idempotent: true });
+      await FileSystem.deleteAsync(`${response.uri}-shm`, { idempotent: true });
+
+      await Apis.reloadDb();
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Call handleRestoreSqliteDB error:", error);
     }
   };
 
