@@ -21,10 +21,10 @@ const UploadScreen = () => {
         multiple: true,
       });
 
-      if (result.canceled || result.assets.length === 0) throw new Error("No file selected");
+      if (result.canceled || result.assets.length === 0) return;
 
       await Promise.allSettled(
-        result.assets.map(async (asset) => {
+        result.assets.map(async (asset: DocumentPicker.DocumentPickerAsset) => {
           const { uri, name } = asset;
           const destinationUri = FileSystem.documentDirectory + name;
 
@@ -53,6 +53,9 @@ const UploadScreen = () => {
           };
           const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
           if (!musicId) throw new Error("Failed to post music");
+
+          const file = await FileSystem.getInfoAsync(destinationUri);
+          if (file.exists) await Apis.file.postFile("assets", file);
 
           if (selectedTagIds.size > 0) {
             Apis.sqlite?.musicTag.postMusicTags({
@@ -83,7 +86,7 @@ const UploadScreen = () => {
       <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, alignItems: "center" }}>
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload Audio" onPress={handleUploadFile} />}
+          {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload" onPress={handleUploadFile} />}
         </View>
       </SafeAreaView>
     </>

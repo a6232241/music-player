@@ -38,7 +38,7 @@ const ProfileScreen = () => {
       <SafeAreaView style={{ flex: 1, gap: 10 }}>
         <Link href="../upload" asChild>
           <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: "black" }}>
-            <Text style={{ fontSize: 20 }}>Upload</Text>
+            <Text style={{ fontSize: 20 }}>Upload Music</Text>
           </TouchableOpacity>
         </Link>
         <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: "black" }} onPress={handleBackupSqliteDB}>
