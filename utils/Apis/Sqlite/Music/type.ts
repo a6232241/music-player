@@ -1,9 +1,5 @@
 import { SortType } from "@/components/SortSelect";
 
-type OnlyLocalType = {
-  isTemporary?: boolean;
-};
-
 type MusicType = {
   id: number;
   title?: string;
@@ -19,7 +15,7 @@ type MusicType = {
   fileName: string;
   createdAt: Date;
   updateAt: Date;
-} & OnlyLocalType;
+};
 
 type PostMusicRequire = Omit<MusicType, "id" | "createdAt" | "updateAt">;
 

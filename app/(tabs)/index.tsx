@@ -2,18 +2,17 @@ import AudioItem from "@/components/AudioItem";
 import SortSelect, { SortType } from "@/components/SortSelect";
 import TagMultiSelect from "@/components/TagMultiSelect";
 import Apis from "@/utils/Apis";
-import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
 import { getDocumentFile } from "@/utils/helper";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { ComponentProps, useCallback, useEffect, useState } from "react";
 import { Button, FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const player = useAudioPlayer();
   const status = useAudioPlayerStatus(player);
-  const [audios, setAudios] = useState<GetMusicResponse[]>([]);
+  const [audios, setAudios] = useState<ComponentProps<typeof AudioItem>["data"][]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
   const [selectedSortType, setSelectedSortType] = useState<SortType>(SortType.DEFAULT);
   const [audioId, setAudioId] = useState<number>();
@@ -62,16 +61,34 @@ export default function Index() {
     }
   };
 
+  const getAudios = useCallback(async () => {
+    const tagIds = Array.from(selectedTagIds);
+    const list =
+      !tagIds || tagIds.length === 0
+        ? await Apis.sqlite?.music.getMusics({ sortType: selectedSortType })
+        : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds, sortType: selectedSortType });
+    return list;
+  }, [selectedTagIds, selectedSortType]);
+
+  const addIsExistByAudios = useCallback(async (audios: ComponentProps<typeof AudioItem>["data"][]) => {
+    return Promise.all(
+      audios.map(async (audio) => {
+        const filePath = (await getDocumentFile(audio.fileName))?.uri;
+        audio.isExist = !!filePath;
+        return audio;
+      }),
+    );
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       try {
         (async () => {
-          let tagIds = Array.from(selectedTagIds);
-          const list =
-            !tagIds || tagIds.length === 0
-              ? await Apis.sqlite?.music.getMusics({ sortType: selectedSortType })
-              : await Apis.sqlite?.music.getMusicsByTagIds({ ids: tagIds, sortType: selectedSortType });
+          let list = await getAudios();
           if (!list) throw new Error("Failed to get musics");
+
+          list = await addIsExistByAudios(list);
+
           if (list.length > 0 && !player.playing) {
             const filePath = (await getDocumentFile(list[0].fileName))?.uri;
             if (filePath) {
@@ -84,7 +101,7 @@ export default function Index() {
       } catch (error) {
         console.error("Error getting musics:", error);
       }
-    }, [player, selectedTagIds, selectedSortType]),
+    }, [getAudios, player, addIsExistByAudios]),
   );
 
   useEffect(() => {
