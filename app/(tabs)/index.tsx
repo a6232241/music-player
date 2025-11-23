@@ -110,6 +110,15 @@ export default function Index() {
     handleAudioItemPress(currentIndex + 1);
   }, [status.didJustFinish, handleAudioItemPress, player, audios, audioId]);
 
+  const setAudio = (audio: ComponentProps<typeof AudioItem>["data"]) => {
+    const index = audios.findIndex((item) => item.id === audio.id);
+    if (index >= 0) {
+      const newAudios = [...audios];
+      newAudios[index] = audio;
+      setAudios(newAudios);
+    }
+  };
+
   return (
     <>
       <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1, gap: 20 }}>
@@ -121,7 +130,9 @@ export default function Index() {
           <FlatList
             data={audios}
             keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item, index }) => <AudioItem data={item} onPress={() => handleAudioItemPress(index)} />}
+            renderItem={({ item, index }) => (
+              <AudioItem data={item} onPress={() => handleAudioItemPress(index)} setData={setAudio} />
+            )}
             contentContainerStyle={{ gap: 5 }}
           />
           <View>

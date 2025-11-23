@@ -7,7 +7,6 @@ class File {
     this.origin = origin;
     this.pathname = "file";
   }
-
   async getFile(remotePath: string, localPath: string): Promise<FileSystem.FileSystemDownloadResult | undefined> {
     try {
       const dir = localPath.split("/").slice(0, -1).join("/");
@@ -23,6 +22,7 @@ class File {
       return response;
     } catch (error) {
       console.error("Error downloading file:", error);
+      throw error;
     }
   }
 
