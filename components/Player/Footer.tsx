@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { MusicType } from "@/utils/Apis/Sqlite/Music/type";
 import { Image } from "expo-image";
 import React from "react";
@@ -9,19 +10,23 @@ type Props = {
   artist: string;
 };
 
-const Footer = ({ track, title, artist }: Props) => (
-  <View style={styles.footerContent}>
-    <Image source={track?.albumArt} style={styles.albumArtSmall} contentFit="cover" />
-    <View style={styles.textContainer}>
-      <Text style={styles.title} numberOfLines={1}>
-        {title}
-      </Text>
-      <Text style={styles.artist} numberOfLines={1}>
-        {artist}
-      </Text>
+const Footer = ({ track, title, artist }: Props) => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.footerContent}>
+      <Image source={track?.albumArt} style={styles.albumArtSmall} contentFit="cover" />
+      <View style={styles.textContainer}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={[styles.artist, { color: colors.text }]} numberOfLines={1}>
+          {artist}
+        </Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 export default React.memo(Footer);
 

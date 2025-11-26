@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -35,20 +36,22 @@ export default function RootLayout() {
   useDrizzleStudio(db);
 
   return (
-    <ActionSheetProvider>
-      <SafeAreaProvider>
-        {isDbLoading && (
-          <SafeAreaView style={{ flex: 1 }}>
-            <Text>Loading...</Text>
-          </SafeAreaView>
-        )}
-        {!isDbLoading && (
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="upload" />
-          </Stack>
-        )}
-      </SafeAreaProvider>
-    </ActionSheetProvider>
+    <ThemeProvider>
+      <ActionSheetProvider>
+        <SafeAreaProvider>
+          {isDbLoading && (
+            <SafeAreaView style={{ flex: 1 }}>
+              <Text>Loading...</Text>
+            </SafeAreaView>
+          )}
+          {!isDbLoading && (
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="upload" />
+            </Stack>
+          )}
+        </SafeAreaProvider>
+      </ActionSheetProvider>
+    </ThemeProvider>
   );
 }

@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { MusicType } from "@/utils/Apis/Sqlite/Music/type";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const Player: React.FC<Props> = ({ track, isPlaying, onPlayPause, onNext, onPrev }) => {
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   if (!track) return null;
@@ -26,11 +28,13 @@ const Player: React.FC<Props> = ({ track, isPlaying, onPlayPause, onNext, onPrev
     <>
       {/* Mini Player (Visible when modal is closed) */}
       {!modalVisible && (
-        <TouchableOpacity style={styles.miniPlayer} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity
+          style={[styles.miniPlayer, { backgroundColor: colors.background, borderTopColor: colors.border }]}
+          onPress={() => setModalVisible(true)}>
           <Footer track={track} title={title} artist={artist} />
           <View style={styles.miniControls}>
             <TouchableOpacity onPress={onPlayPause}>
-              <Ionicons name={isPlaying ? "pause" : "play"} size={24} color="black" />
+              <Ionicons name={isPlaying ? "pause" : "play"} size={24} color={colors.text} />
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -43,29 +47,29 @@ const Player: React.FC<Props> = ({ track, isPlaying, onPlayPause, onNext, onPrev
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}>
         <SafeAreaProvider>
-          <SafeAreaView style={styles.modalContainer}>
+          <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.background }]}>
             <View style={styles.modalHeader}>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                <Ionicons name="chevron-down" size={30} color="black" />
+                <Ionicons name="chevron-down" size={30} color={colors.text} />
               </TouchableOpacity>
             </View>
 
             {/* Lyrics Section */}
             <View style={styles.lyricsContainer}>
               <ScrollView contentContainerStyle={styles.lyricsContent}>
-                <Text style={styles.lyricsText}>{track.lyrics ? track.lyrics : "not find lyrics"}</Text>
+                <Text style={[styles.lyricsText, { color: colors.text }]}>{track.lyrics ? track.lyrics : "not find lyrics"}</Text>
               </ScrollView>
             </View>
 
             {/* Footer Section in Modal */}
-            <View style={styles.modalFooter}>
+            <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
               <View style={styles.modalFooterContent}>
                 <Image source={track.albumArt} style={styles.albumArtLarge} contentFit="cover" />
                 <View style={styles.modalTextContainer}>
-                  <Text style={styles.modalTitle} numberOfLines={1}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]} numberOfLines={1}>
                     {title}
                   </Text>
-                  <Text style={styles.modalArtist} numberOfLines={1}>
+                  <Text style={[styles.modalArtist, { color: colors.text }]} numberOfLines={1}>
                     {artist}
                   </Text>
                 </View>
@@ -74,13 +78,13 @@ const Player: React.FC<Props> = ({ track, isPlaying, onPlayPause, onNext, onPrev
               {/* Controls */}
               <View style={styles.controls}>
                 <TouchableOpacity onPress={onPrev}>
-                  <Ionicons name="play-skip-back" size={35} color="black" />
+                  <Ionicons name="play-skip-back" size={35} color={colors.text} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={onPlayPause} style={styles.playPauseButton}>
-                  <Ionicons name={isPlaying ? "pause" : "play"} size={45} color="black" />
+                  <Ionicons name={isPlaying ? "pause" : "play"} size={45} color={colors.text} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={onNext}>
-                  <Ionicons name="play-skip-forward" size={35} color="black" />
+                  <Ionicons name="play-skip-forward" size={35} color={colors.text} />
                 </TouchableOpacity>
               </View>
             </View>

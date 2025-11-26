@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { getDocumentFile } from "@/utils/helper";
 import * as FileSystem from "expo-file-system";
@@ -8,6 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const dbPath = "SQLite/main.db";
 
 const ProfileScreen = () => {
+  const { colors } = useTheme();
+
   const handleBackupSqliteDB = async () => {
     try {
       const file = await getDocumentFile(dbPath);
@@ -35,17 +38,17 @@ const ProfileScreen = () => {
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1, gap: 10 }}>
+      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, gap: 10, backgroundColor: colors.background }}>
         <Link href="../upload" asChild>
-          <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: "black" }}>
-            <Text style={{ fontSize: 20 }}>Upload Music</Text>
+          <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: colors.border }}>
+            <Text style={{ fontSize: 20, color: colors.text }}>Upload Music</Text>
           </TouchableOpacity>
         </Link>
-        <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: "black" }} onPress={handleBackupSqliteDB}>
-          <Text style={{ fontSize: 20 }}>Backup DB</Text>
+        <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: colors.border }} onPress={handleBackupSqliteDB}>
+          <Text style={{ fontSize: 20, color: colors.text }}>Backup DB</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: "black" }} onPress={handleRestoreSqliteDB}>
-          <Text style={{ fontSize: 20 }}>Restore DB</Text>
+        <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: colors.border }} onPress={handleRestoreSqliteDB}>
+          <Text style={{ fontSize: 20, color: colors.text }}>Restore DB</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </>

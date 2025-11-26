@@ -3,6 +3,7 @@ import AudioList from "@/components/AudioList";
 import Player from "@/components/Player";
 import SortSelect, { SortType } from "@/components/SortSelect";
 import TagMultiSelect from "@/components/TagMultiSelect";
+import { useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { getDocumentFile } from "@/utils/helper";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
@@ -12,6 +13,7 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
+  const { colors } = useTheme();
   const player = useAudioPlayer();
   const status = useAudioPlayerStatus(player);
   const [audios, setAudios] = useState<ComponentProps<typeof AudioItem>["data"][]>([]);
@@ -141,11 +143,11 @@ export default function Index() {
 
   return (
     <>
-      <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1, gap: 20 }}>
+      <SafeAreaView edges={["left", "right"]} style={{ flex: 1, gap: 20, backgroundColor: colors.background }}>
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
 
         <View style={{ flex: 1, gap: 10 }}>
-          <Text style={{ fontWeight: "bold", fontSize: 20 }}>列表</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 20, color: colors.text }}>列表</Text>
           <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
           <AudioList audios={audios} handleAudioItemPress={handleAudioItemPress} setAudio={setAudio} />
           <Player track={track} isPlaying={status.playing} onPlayPause={handlePress} onNext={onNext} onPrev={onPrev} />

@@ -1,4 +1,5 @@
 import TagMultiSelect from "@/components/TagMultiSelect";
+import { useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { PostMusicRequire } from "@/utils/Apis/Sqlite/Music/type";
 import { getMetadataFromUri } from "@/utils/helper";
@@ -10,6 +11,7 @@ import { ActivityIndicator, Button, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const UploadScreen = () => {
+  const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
   const handleUploadFile = async () => {
@@ -83,7 +85,7 @@ const UploadScreen = () => {
 
   return (
     <>
-      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, alignItems: "center" }}>
+      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, alignItems: "center", backgroundColor: colors.background }}>
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload" onPress={handleUploadFile} />}

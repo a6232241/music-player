@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
@@ -18,6 +19,7 @@ type Props = {
 };
 
 const SortSelect: React.FC<Props> = ({ selected, onPress }: Props) => {
+  const { colors } = useTheme();
   const { showActionSheetWithOptions } = useActionSheet();
 
   const handlePress = () => {
@@ -25,6 +27,8 @@ const SortSelect: React.FC<Props> = ({ selected, onPress }: Props) => {
       {
         options,
         cancelButtonIndex,
+        containerStyle: { backgroundColor: colors.background },
+        textStyle: { color: colors.text },
       },
       onPress,
     );
@@ -34,8 +38,8 @@ const SortSelect: React.FC<Props> = ({ selected, onPress }: Props) => {
     <>
       <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
         <TouchableOpacity onPress={handlePress} style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
-          <FontAwesome name="sort" size={24} color="black" />
-          <Text>{options[selected]}</Text>
+          <FontAwesome name="sort" size={24} color={colors.text} />
+          <Text style={{ color: colors.text }}>{options[selected]}</Text>
         </TouchableOpacity>
       </View>
     </>

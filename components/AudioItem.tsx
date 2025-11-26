@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
 import * as FileSystem from "expo-file-system";
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
+  const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const handleDownloadPress = async () => {
     setIsLoading(true);
@@ -43,13 +45,15 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
             gap: 10,
             padding: 10,
             height: 70,
-            backgroundColor: "white",
+            backgroundColor: colors.background,
             opacity: data?.isExist ? 1 : 0.5,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
           }}
           pointerEvents={data?.isExist ? "auto" : "none"}>
-          <Button title="Play" onPress={onPress} />
+          <Button title="Play" onPress={onPress} color={colors.tint} />
           <Image style={{ height: "100%", aspectRatio: 1 }} source={data?.albumArt} />
-          <Text>{data?.title ?? ""}</Text>
+          <Text style={{ color: colors.text }}>{data?.title ?? ""}</Text>
         </View>
 
         {!data?.isExist && (
@@ -63,9 +67,9 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
               backgroundColor: "rgba(0, 0, 0, 0.75)",
             }}>
             {isLoading ? (
-              <ActivityIndicator size="large" color="white" />
+              <ActivityIndicator size="large" color={colors.tint} />
             ) : (
-              <Button title="Download" onPress={handleDownloadPress} />
+              <Button title="Download" onPress={handleDownloadPress} color={colors.tint} />
             )}
           </View>
         )}
