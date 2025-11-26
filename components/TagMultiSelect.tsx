@@ -1,6 +1,6 @@
 import Apis from "@/utils/Apis";
 import { GetTagGenreIncludeTagsResponse } from "@/utils/Apis/Sqlite/TagGenre/type";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
@@ -56,4 +56,4 @@ const TagMultiSelect = ({ selected, onPress }: Props) => {
   );
 };
 
-export default TagMultiSelect;
+export default React.memo(TagMultiSelect);

@@ -42,4 +42,4 @@ const SortSelect: React.FC<Props> = ({ selected, onPress }: Props) => {
   );
 };
 
-export default SortSelect;
+export default React.memo(SortSelect);

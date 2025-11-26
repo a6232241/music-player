@@ -74,4 +74,4 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
   );
 };
 
-export default AudioItem;
+export default React.memo(AudioItem);

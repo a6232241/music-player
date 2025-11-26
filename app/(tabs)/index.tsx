@@ -1,12 +1,14 @@
 import AudioItem from "@/components/AudioItem";
+import AudioList from "@/components/AudioList";
+import Player from "@/components/Player";
 import SortSelect, { SortType } from "@/components/SortSelect";
 import TagMultiSelect from "@/components/TagMultiSelect";
 import Apis from "@/utils/Apis";
 import { getDocumentFile } from "@/utils/helper";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useFocusEffect } from "expo-router";
-import { ComponentProps, useCallback, useEffect, useState } from "react";
-import { Button, FlatList, Text, View } from "react-native";
+import React, { ComponentProps, useCallback, useEffect, useState } from "react";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -16,11 +18,12 @@ export default function Index() {
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
   const [selectedSortType, setSelectedSortType] = useState<SortType>(SortType.DEFAULT);
   const [audioId, setAudioId] = useState<number>();
+  const track = React.useMemo(() => audios.find((a) => a.id === audioId), [audios, audioId]);
 
-  const handlePress = () => {
+  const handlePress = useCallback(() => {
     if (player.paused) player.play();
     else player.pause();
-  };
+  }, [player]);
 
   const handleAudioItemPress = useCallback(
     async (_index: number) => {
@@ -38,16 +41,16 @@ export default function Index() {
     [player, audios],
   );
 
-  const handleSelectTagId = (id: number) => {
+  const handleSelectTagId = useCallback((id: number) => {
     setSelectedTagIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) newSet.delete(id);
       else newSet.add(id);
       return newSet;
     });
-  };
+  }, []);
 
-  const handleSelectSortType = (index?: number | undefined) => {
+  const handleSelectSortType = useCallback((index?: number | undefined) => {
     switch (index) {
       case SortType.DATE_ASC:
         setSelectedSortType(SortType.DATE_ASC);
@@ -59,7 +62,7 @@ export default function Index() {
         setSelectedSortType(SortType.DEFAULT);
         break;
     }
-  };
+  }, []);
 
   const getAudios = useCallback(async () => {
     const tagIds = Array.from(selectedTagIds);
@@ -79,6 +82,32 @@ export default function Index() {
       }),
     );
   }, []);
+
+  const setAudio = useCallback(
+    (audio: ComponentProps<typeof AudioItem>["data"]) => {
+      const index = audios.findIndex((item) => item.id === audio.id);
+      if (index >= 0) {
+        const newAudios = [...audios];
+        newAudios[index] = audio;
+        setAudios(newAudios);
+      }
+    },
+    [audios],
+  );
+
+  const onNext = useCallback(() => {
+    const currentIndex = audios.findIndex((a) => a.id === audioId);
+    if (currentIndex < audios.length - 1) {
+      handleAudioItemPress(currentIndex + 1);
+    }
+  }, [audios, audioId, handleAudioItemPress]);
+
+  const onPrev = useCallback(() => {
+    const currentIndex = audios.findIndex((a) => a.id === audioId);
+    if (currentIndex > 0) {
+      handleAudioItemPress(currentIndex - 1);
+    }
+  }, [audios, audioId, handleAudioItemPress]);
 
   useFocusEffect(
     useCallback(() => {
@@ -110,15 +139,6 @@ export default function Index() {
     handleAudioItemPress(currentIndex + 1);
   }, [status.didJustFinish, handleAudioItemPress, player, audios, audioId]);
 
-  const setAudio = (audio: ComponentProps<typeof AudioItem>["data"]) => {
-    const index = audios.findIndex((item) => item.id === audio.id);
-    if (index >= 0) {
-      const newAudios = [...audios];
-      newAudios[index] = audio;
-      setAudios(newAudios);
-    }
-  };
-
   return (
     <>
       <SafeAreaView edges={["top", "left", "right"]} style={{ flex: 1, gap: 20 }}>
@@ -127,21 +147,8 @@ export default function Index() {
         <View style={{ flex: 1, gap: 10 }}>
           <Text style={{ fontWeight: "bold", fontSize: 20 }}>列表</Text>
           <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
-          <FlatList
-            data={audios}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <AudioItem data={item} onPress={() => handleAudioItemPress(index)} setData={setAudio} />
-            )}
-            contentContainerStyle={{ gap: 5 }}
-          />
-          <View>
-            <Text>Playing: {status.playing ? "Yes" : "No"}</Text>
-            <Text>Current Time: {status.currentTime}s</Text>
-            <Text>Duration: {status.duration}s</Text>
-            <Text>didJustFinish: {status.didJustFinish ? "true" : "false"}</Text>
-            <Button title="Play / Pause" onPress={handlePress} />
-          </View>
+          <AudioList audios={audios} handleAudioItemPress={handleAudioItemPress} setAudio={setAudio} />
+          <Player track={track} isPlaying={status.playing} onPlayPause={handlePress} onNext={onNext} onPrev={onPrev} />
         </View>
       </SafeAreaView>
     </>
