@@ -1,4 +1,5 @@
-import { ThemeProvider } from "@/context/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -10,6 +11,24 @@ import { Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
+
+const Router = () => {
+  const { colors } = useTheme();
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: true,
+        headerRight: () => <ThemeToggle />,
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
+      }}>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="upload" options={{ title: "上傳音樂" }} />
+    </Stack>
+  );
+};
 
 export default function RootLayout() {
   const [isDbLoading, setIsDbLoading] = useState(true);
@@ -44,12 +63,7 @@ export default function RootLayout() {
               <Text>Loading...</Text>
             </SafeAreaView>
           )}
-          {!isDbLoading && (
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="upload" />
-            </Stack>
-          )}
+          {!isDbLoading && <Router />}
         </SafeAreaProvider>
       </ActionSheetProvider>
     </ThemeProvider>
