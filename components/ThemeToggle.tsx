@@ -8,11 +8,7 @@ export default function ThemeToggle() {
 
   return (
     <Pressable onPress={toggleTheme} style={styles.container}>
-      <Ionicons
-        name={theme === "light" ? "sunny" : "moon"}
-        size={24}
-        color={colors.text}
-      />
+      <Ionicons name={theme === "light" ? "sunny" : "moon"} size={24} color={colors.text} />
     </Pressable>
   );
 }

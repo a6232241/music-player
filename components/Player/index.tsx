@@ -57,7 +57,9 @@ const Player: React.FC<Props> = ({ track, isPlaying, onPlayPause, onNext, onPrev
             {/* Lyrics Section */}
             <View style={styles.lyricsContainer}>
               <ScrollView contentContainerStyle={styles.lyricsContent}>
-                <Text style={[styles.lyricsText, { color: colors.text }]}>{track.lyrics ? track.lyrics : "not find lyrics"}</Text>
+                <Text style={[styles.lyricsText, { color: colors.text }]}>
+                  {track.lyrics ? track.lyrics : "not find lyrics"}
+                </Text>
               </ScrollView>
             </View>
 

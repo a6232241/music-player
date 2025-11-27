@@ -38,16 +38,22 @@ const ProfileScreen = () => {
 
   return (
     <>
-      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, gap: 10, backgroundColor: colors.background }}>
+      <SafeAreaView
+        edges={["left", "right", "bottom"]}
+        style={{ flex: 1, gap: 10, backgroundColor: colors.background }}>
         <Link href="../upload" asChild>
           <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: colors.border }}>
             <Text style={{ fontSize: 20, color: colors.text }}>Upload Music</Text>
           </TouchableOpacity>
         </Link>
-        <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: colors.border }} onPress={handleBackupSqliteDB}>
+        <TouchableOpacity
+          style={{ padding: 10, borderWidth: 1, borderColor: colors.border }}
+          onPress={handleBackupSqliteDB}>
           <Text style={{ fontSize: 20, color: colors.text }}>Backup DB</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ padding: 10, borderWidth: 1, borderColor: colors.border }} onPress={handleRestoreSqliteDB}>
+        <TouchableOpacity
+          style={{ padding: 10, borderWidth: 1, borderColor: colors.border }}
+          onPress={handleRestoreSqliteDB}>
           <Text style={{ fontSize: 20, color: colors.text }}>Restore DB</Text>
         </TouchableOpacity>
       </SafeAreaView>

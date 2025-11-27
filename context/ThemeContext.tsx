@@ -20,7 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // For now, let's just stick to the requested behavior: "default is user system"
   // If we want to strictly follow system changes until manual toggle, we might need more logic.
   // But usually "default is user system" means initial state.
-  
+
   useEffect(() => {
     if (systemColorScheme) {
       setTheme(systemColorScheme);
@@ -33,11 +33,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const colors = Colors[theme];
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, colors }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, toggleTheme, colors }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
