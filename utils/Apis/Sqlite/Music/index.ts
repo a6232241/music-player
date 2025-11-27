@@ -11,10 +11,28 @@ import {
 class Music extends Config {
   async postMusic(req: PostMusicRequire) {
     try {
+      if (req.md5) {
+        const existingMusicByMd5 = await this.db.getFirstAsync<{ id: number }>("SELECT id FROM music WHERE md5 = ?", [
+          req.md5,
+        ]);
+        if (existingMusicByMd5) {
+          return existingMusicByMd5.id;
+        }
+      }
+
+      const existingMusicByName = await this.db.getFirstAsync<{ id: number }>(
+        "SELECT id FROM music WHERE file_name = ?",
+        [req.fileName],
+      );
+
+      if (existingMusicByName) {
+        return existingMusicByName.id;
+      }
+
       const result = await this.db.runAsync(
         `INSERT INTO music 
-          (title, artist, album, album_art, lyrics, duration, year, date, copyright, file_url, file_name)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          (title, artist, album, album_art, lyrics, duration, year, date, copyright, file_url, file_name, md5)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           req.title ?? null,
           req.artist ?? null,
@@ -27,6 +45,7 @@ class Music extends Config {
           req.copyright ?? null,
           req.fileUrl ?? null,
           req.fileName,
+          req.md5 ?? null,
         ],
       );
 

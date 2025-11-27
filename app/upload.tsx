@@ -35,6 +35,9 @@ const UploadScreen = () => {
             to: destinationUri,
           });
 
+          const fileInfo = await FileSystem.getInfoAsync(destinationUri, { md5: true });
+          if (!fileInfo.exists) throw new Error("File copy failed");
+
           const meta = await getMetadataFromUri(uri);
           if (!meta) throw new Error("Failed to get metadata");
 
@@ -52,12 +55,12 @@ const UploadScreen = () => {
             date: meta?.common?.date,
             copyright: meta?.common?.copyright,
             fileName: name,
+            md5: fileInfo.md5,
           };
           const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
           if (!musicId) throw new Error("Failed to post music");
 
-          const file = await FileSystem.getInfoAsync(destinationUri);
-          if (file.exists) await Apis.file.postFile("assets", file);
+          if (fileInfo.exists) await Apis.file.postFile("assets", fileInfo);
 
           if (selectedTagIds.size > 0) {
             Apis.sqlite?.musicTag.postMusicTags({
@@ -85,7 +88,9 @@ const UploadScreen = () => {
 
   return (
     <>
-      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, alignItems: "center", backgroundColor: colors.background }}>
+      <SafeAreaView
+        edges={["left", "right", "bottom"]}
+        style={{ flex: 1, alignItems: "center", backgroundColor: colors.background }}>
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload" onPress={handleUploadFile} />}

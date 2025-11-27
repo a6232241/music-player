@@ -13,6 +13,7 @@ type MusicType = {
   copyright?: string;
   fileUrl?: string;
   fileName: string;
+  md5?: string;
   createdAt: Date;
   updateAt: Date;
 };

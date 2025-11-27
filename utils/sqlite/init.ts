@@ -2,7 +2,7 @@ import { SQLiteDatabase } from "expo-sqlite";
 
 export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: boolean }> {
   try {
-    const DATABASE_VERSION = 1;
+    const DATABASE_VERSION = 2;
     let currentDbVersion =
       (await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version"))?.user_version ?? null;
 
@@ -34,7 +34,8 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: 
           file_name TEXT NOT NULL,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
           updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-          is_temporary INTEGER DEFAULT 1
+          is_temporary INTEGER DEFAULT 1,
+          md5 TEXT
         );
 
         CREATE TABLE IF NOT EXISTS music_play (
@@ -125,6 +126,13 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: 
     `);
 
       currentDbVersion = 1;
+    }
+
+    if (currentDbVersion === 1) {
+      await db.execAsync(`
+        ALTER TABLE music ADD COLUMN md5 TEXT;
+      `);
+      currentDbVersion = 2;
     }
 
     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
