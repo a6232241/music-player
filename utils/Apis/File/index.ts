@@ -1,4 +1,5 @@
 import * as FileSystem from "expo-file-system";
+import { GetMusicResponse } from "../Sqlite/Music/type";
 import { DownloadProgress, DownloadResult } from "./type";
 
 class File {
@@ -94,6 +95,29 @@ class File {
       console.error(`Error downloading ${fileName}:`, error);
       return { success: false, fileName, error: errorMessage };
     }
+  }
+
+  async downloadAllAudios(
+    audios: GetMusicResponse[],
+    onProgress?: (fileName: string, progress: DownloadProgress) => void,
+    onComplete?: (result: DownloadResult) => void,
+  ): Promise<DownloadResult[]> {
+    const results: DownloadResult[] = await Promise.all(
+      audios.map(async (audio) => {
+        const result = await this.downloadAudio(audio.fileName, (progress) => {
+          if (onProgress) {
+            onProgress(audio.fileName, progress);
+          }
+        });
+
+        if (onComplete) {
+          onComplete(result);
+        }
+        return result;
+      }),
+    );
+
+    return results;
   }
 }
 

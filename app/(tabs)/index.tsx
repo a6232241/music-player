@@ -9,7 +9,7 @@ import { getDocumentFile } from "@/utils/helper";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useFocusEffect } from "expo-router";
 import React, { ComponentProps, useCallback, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Alert, Button, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
@@ -20,6 +20,7 @@ export default function Index() {
   const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set());
   const [selectedSortType, setSelectedSortType] = useState<SortType>(SortType.DEFAULT);
   const [audioId, setAudioId] = useState<number>();
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, { progress: number; loading: boolean }>>({});
   const track = React.useMemo(() => audios.find((a) => a.id === audioId), [audios, audioId]);
 
   const handlePress = useCallback(() => {
@@ -85,17 +86,16 @@ export default function Index() {
     );
   }, []);
 
-  const setAudio = useCallback(
-    (audio: ComponentProps<typeof AudioItem>["data"]) => {
-      const index = audios.findIndex((item) => item.id === audio.id);
+  const setAudio = useCallback((audio: ComponentProps<typeof AudioItem>["data"]) => {
+    setAudios((prev) => {
+      const newAudios = [...prev];
+      const index = newAudios.findIndex((item) => item.id === audio.id);
       if (index >= 0) {
-        const newAudios = [...audios];
         newAudios[index] = audio;
-        setAudios(newAudios);
       }
-    },
-    [audios],
-  );
+      return newAudios;
+    });
+  }, []);
 
   const onNext = useCallback(() => {
     const currentIndex = audios.findIndex((a) => a.id === audioId);
@@ -110,6 +110,73 @@ export default function Index() {
       handleAudioItemPress(currentIndex - 1);
     }
   }, [audios, audioId, handleAudioItemPress]);
+
+  const handleDownloadAll = useCallback(async () => {
+    const audiosToDownload = audios.filter((audio) => !audio.isExist);
+
+    if (audiosToDownload.length === 0) {
+      return;
+    }
+
+    try {
+      const initialProgress: Record<string, { progress: number; loading: boolean }> = {};
+      audiosToDownload.forEach((audio) => {
+        initialProgress[audio.fileName] = { progress: 0, loading: true };
+      });
+      setDownloadProgress(initialProgress);
+
+      const results = await Apis.file.downloadAllAudios(
+        audiosToDownload,
+        (fileName, progress) => {
+          setDownloadProgress((prev) => ({
+            ...prev,
+            [fileName]: { progress: progress.progress * 100, loading: true },
+          }));
+        },
+        (result) => {
+          if (result.success) {
+            const updatedAudio = audios.find((a) => a.fileName === result.fileName);
+            if (updatedAudio) {
+              setAudio({ ...updatedAudio, isExist: true });
+            }
+          }
+
+          setDownloadProgress((prev) => {
+            const newProgress = { ...prev };
+            delete newProgress[result.fileName];
+            return newProgress;
+          });
+        },
+      );
+      const successCount = results.filter((r) => r.success).length;
+      const failedCount = results.length - successCount;
+
+      if (failedCount === 0) {
+        Alert.alert("Success", `Downloaded all ${successCount} songs`);
+      } else {
+        Alert.alert("Partial Success", `Downloaded ${successCount} songs, ${failedCount} failed`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setTimeout(() => {
+        setDownloadProgress({});
+      }, 500);
+    }
+  }, [audios, setAudio]);
+
+  const handleRefreshAudios = useCallback(async () => {
+    try {
+      let list = await getAudios();
+      if (!list) throw new Error("Failed to get musics");
+
+      list = await addIsExistByAudios(list);
+
+      setAudios(list);
+    } catch (error) {
+      console.error("Error getting musics:", error);
+    }
+  }, [getAudios, addIsExistByAudios]);
 
   useFocusEffect(
     useCallback(() => {
@@ -147,9 +214,20 @@ export default function Index() {
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
 
         <View style={{ flex: 1, gap: 10 }}>
-          <Text style={{ fontWeight: "bold", fontSize: 20, color: colors.text }}>列表</Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={{ fontWeight: "bold", fontSize: 20, color: colors.text }}>列表</Text>
+            {audios.some((audio) => !audio.isExist) && (
+              <Button title="Download All Audios" onPress={handleDownloadAll} color={colors.tint} />
+            )}
+          </View>
           <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
-          <AudioList audios={audios} handleAudioItemPress={handleAudioItemPress} setAudio={setAudio} />
+          <AudioList
+            audios={audios}
+            onAudioItemPress={handleAudioItemPress}
+            setAudio={setAudio}
+            downloadProgress={downloadProgress}
+            onRefresh={handleRefreshAudios}
+          />
           <Player track={track} isPlaying={status.playing} onPlayPause={handlePress} onNext={onNext} onPrev={onPrev} />
         </View>
       </SafeAreaView>

@@ -12,12 +12,17 @@ type Props = {
   data: Data;
   onPress: () => void;
   setData: (audios: Data) => void;
+  externalProgress?: number;
+  externalLoading?: boolean;
 };
 
-const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
+const AudioItem: React.FC<Props> = ({ data, onPress, setData, externalProgress, externalLoading }) => {
   const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const displayProgress = externalProgress ?? progress;
+  const displayLoading = externalLoading ?? isLoading;
 
   const handleDownloadPress = async () => {
     setIsLoading(true);
@@ -76,10 +81,10 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
               justifyContent: "center",
               backgroundColor: "rgba(0, 0, 0, 0.75)",
             }}>
-            {isLoading ? (
+            {displayLoading ? (
               <View style={{ alignItems: "center", gap: 5 }}>
                 <ActivityIndicator size="large" color={colors.tint} />
-                <Text style={{ color: colors.text, fontSize: 12 }}>{Math.round(progress)}%</Text>
+                <Text style={{ color: colors.text, fontSize: 12 }}>{Math.round(displayProgress)}%</Text>
               </View>
             ) : (
               <Button title="Download" onPress={handleDownloadPress} color={colors.tint} />
