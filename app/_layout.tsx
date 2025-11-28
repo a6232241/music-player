@@ -3,6 +3,7 @@ import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import * as FileSystem from "expo-file-system";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as SQLite from "expo-sqlite";
@@ -41,6 +42,10 @@ export default function RootLayout() {
         if (!dbInitResult) {
           throw new Error("Failed to initialize the database");
         }
+
+        await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}/audio`, {
+          intermediates: true,
+        });
 
         setDb(dbInitResult.db);
       } catch (error) {

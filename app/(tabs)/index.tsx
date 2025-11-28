@@ -32,7 +32,7 @@ export default function Index() {
       // replace 需要加載，因此設定播放時間重置，避免進入下一首音樂時，播放狀態尚未改變，導致播放時間錯誤
       player.seekTo(0);
 
-      const filePath = (await getDocumentFile(audios[_index].fileName))?.uri;
+      const filePath = (await getDocumentFile(`audio/${audios[_index].fileName}`))?.uri;
       if (!filePath) return;
 
       player.replace(filePath);
@@ -78,7 +78,7 @@ export default function Index() {
   const addIsExistByAudios = useCallback(async (audios: ComponentProps<typeof AudioItem>["data"][]) => {
     return Promise.all(
       audios.map(async (audio) => {
-        const filePath = (await getDocumentFile(audio.fileName))?.uri;
+        const filePath = (await getDocumentFile(`audio/${audio.fileName}`))?.uri;
         audio.isExist = !!filePath;
         return audio;
       }),
@@ -121,7 +121,7 @@ export default function Index() {
           list = await addIsExistByAudios(list);
 
           if (list.length > 0 && !player.playing) {
-            const filePath = (await getDocumentFile(list[0].fileName))?.uri;
+            const filePath = (await getDocumentFile(`audio/${list[0].fileName}`))?.uri;
             if (filePath) {
               player.replace(filePath);
               setAudioId(list[0]?.id);

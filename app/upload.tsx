@@ -28,7 +28,7 @@ const UploadScreen = () => {
       await Promise.allSettled(
         result.assets.map(async (asset: DocumentPicker.DocumentPickerAsset) => {
           const { uri, name } = asset;
-          const destinationUri = FileSystem.documentDirectory + name;
+          const destinationUri = `${FileSystem.documentDirectory}audio/${name}`;
 
           await FileSystem.copyAsync({
             from: uri,

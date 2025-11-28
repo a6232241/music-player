@@ -1,7 +1,7 @@
 import { useTheme } from "@/context/ThemeContext";
 import Apis from "@/utils/Apis";
+import { DownloadProgress } from "@/utils/Apis/File/type";
 import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
-import * as FileSystem from "expo-file-system";
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, Button, Text, View } from "react-native";
@@ -17,21 +17,31 @@ type Props = {
 const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
   const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const handleDownloadPress = async () => {
     setIsLoading(true);
+    setProgress(0);
     try {
       if (!data?.fileName) throw new Error("This music is not exist file name");
-      await Apis.file.getFile(`assets/${data?.fileName}`, `${FileSystem.documentDirectory}/${data?.fileName}`);
-      setData({ ...data, isExist: true });
+
+      const result = await Apis.file.downloadAudio(data.fileName, (downloadProgress: DownloadProgress) => {
+        setProgress(downloadProgress.progress * 100);
+      });
+
+      if (result.success) {
+        setData({ ...data, isExist: true });
+      } else {
+        throw new Error(result.error || "Download failed");
+      }
     } catch (error) {
-      let errorMessage = "Unknown error";
-      if (error instanceof Error) errorMessage = error.message;
-      else if (typeof error === "string") errorMessage = error;
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       Alert.alert("Error", errorMessage);
       console.error("Call handleDownloadPress error:", error);
     } finally {
       setIsLoading(false);
+      setProgress(0);
     }
   };
 
@@ -67,7 +77,10 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData }) => {
               backgroundColor: "rgba(0, 0, 0, 0.75)",
             }}>
             {isLoading ? (
-              <ActivityIndicator size="large" color={colors.tint} />
+              <View style={{ alignItems: "center", gap: 5 }}>
+                <ActivityIndicator size="large" color={colors.tint} />
+                <Text style={{ color: colors.text, fontSize: 12 }}>{Math.round(progress)}%</Text>
+              </View>
             ) : (
               <Button title="Download" onPress={handleDownloadPress} color={colors.tint} />
             )}

@@ -1,4 +1,5 @@
 import * as FileSystem from "expo-file-system";
+import { DownloadProgress, DownloadResult } from "./type";
 
 class File {
   origin: string;
@@ -40,6 +41,58 @@ class File {
       return responseData;
     } catch (error) {
       console.error("Error uploading file:", error);
+    }
+  }
+
+  async downloadAudio(fileName: string, onProgress?: (progress: DownloadProgress) => void): Promise<DownloadResult> {
+    try {
+      if (!fileName) {
+        throw new Error("File name is required");
+      }
+
+      const remotePath = `assets/${fileName}`;
+      const localPath = `${FileSystem.documentDirectory}audio/${fileName}`;
+      const localTempPath = `${FileSystem.documentDirectory}temp/${fileName}`;
+
+      // Check if file already exists
+      const fileInfo = await FileSystem.getInfoAsync(localPath);
+      if (fileInfo.exists) {
+        return { success: true, fileName };
+      }
+
+      // Create download resumable for background support
+      const downloadResumable = FileSystem.createDownloadResumable(
+        `${this.origin}/${this.pathname}/${remotePath}`,
+        localTempPath,
+        {},
+        (downloadProgress) => {
+          if (onProgress) {
+            const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+            onProgress({
+              totalBytesWritten: downloadProgress.totalBytesWritten,
+              totalBytesExpectedToWrite: downloadProgress.totalBytesExpectedToWrite,
+              progress: isNaN(progress) ? 0 : progress,
+            });
+          }
+        },
+      );
+
+      const result = await downloadResumable.downloadAsync();
+
+      if (!result || result.status !== 200) {
+        throw new Error(`Failed to download file: ${fileName}`);
+      }
+
+      await FileSystem.moveAsync({
+        from: localTempPath,
+        to: localPath,
+      });
+
+      return { success: true, fileName };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error(`Error downloading ${fileName}:`, error);
+      return { success: false, fileName, error: errorMessage };
     }
   }
 }
