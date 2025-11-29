@@ -3,7 +3,7 @@ import { SQLiteDatabase } from "expo-sqlite";
 export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: boolean }> {
   try {
     const DATABASE_VERSION = 2;
-    let currentDbVersion =
+    const currentDbVersion =
       (await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version"))?.user_version ?? null;
 
     if (currentDbVersion === null || currentDbVersion >= DATABASE_VERSION) {
@@ -124,15 +124,12 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: 
         INSERT INTO tag (name, tag_genre_id) VALUES ('動漫', 6);
         INSERT INTO tag (name, tag_genre_id) VALUES ('電影', 6);
     `);
-
-      currentDbVersion = 1;
     }
 
     if (currentDbVersion === 1) {
       await db.execAsync(`
         ALTER TABLE music ADD COLUMN md5 TEXT;
       `);
-      currentDbVersion = 2;
     }
 
     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
