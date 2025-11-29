@@ -219,8 +219,8 @@ export default function Index() {
             {audios.some((audio) => !audio.isExist) && (
               <Button title="Download All Audios" onPress={handleDownloadAll} color={colors.tint} />
             )}
+            <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
           </View>
-          <SortSelect selected={selectedSortType} onPress={handleSelectSortType} />
           <AudioList
             audios={audios}
             onAudioItemPress={handleAudioItemPress}

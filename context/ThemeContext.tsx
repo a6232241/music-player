@@ -16,11 +16,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [theme, setTheme] = useState<Theme>(systemColorScheme === "dark" ? "dark" : "light");
 
-  // Update theme if system preference changes, but only if user hasn't manually overridden it?
-  // For now, let's just stick to the requested behavior: "default is user system"
-  // If we want to strictly follow system changes until manual toggle, we might need more logic.
-  // But usually "default is user system" means initial state.
-
   useEffect(() => {
     if (systemColorScheme) {
       setTheme(systemColorScheme);

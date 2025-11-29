@@ -1,5 +1,6 @@
+import { useTheme } from "@/context/ThemeContext";
 import React, { ComponentProps, useCallback } from "react";
-import { FlatList } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import AudioItem from "./AudioItem";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 
 const AudioList = ({ audios, onAudioItemPress, setAudio, downloadProgress, onRefresh }: Props) => {
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const { colors } = useTheme();
 
   const renderItem = useCallback(
     ({ item, index }: { item: ComponentProps<typeof AudioItem>["data"]; index: number }) => {
@@ -39,6 +41,14 @@ const AudioList = ({ audios, onAudioItemPress, setAudio, downloadProgress, onRef
     await onRefresh();
     setIsRefreshing(false);
   }, [onRefresh]);
+
+  if (!audios.length) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: colors.text }}>No audios found</Text>
+      </View>
+    );
+  }
 
   return (
     <FlatList
