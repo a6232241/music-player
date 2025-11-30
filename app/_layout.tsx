@@ -43,9 +43,14 @@ export default function RootLayout() {
           throw new Error("Failed to initialize the database");
         }
 
-        await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}/audio`, {
-          intermediates: true,
-        });
+        await Promise.all([
+          FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}audio`, {
+            intermediates: true,
+          }),
+          FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}temp`, {
+            intermediates: true,
+          }),
+        ]);
 
         setDb(dbInitResult.db);
       } catch (error) {

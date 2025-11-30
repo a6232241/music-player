@@ -4,7 +4,7 @@ import { DownloadProgress } from "@/utils/Apis/File/type";
 import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
 import { Image } from "expo-image";
 import React, { useState } from "react";
-import { ActivityIndicator, Alert, Button, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Button, Text, TouchableOpacity, View } from "react-native";
 
 type Data = GetMusicResponse & { isExist?: boolean };
 
@@ -53,23 +53,24 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData, externalProgress, 
   return (
     <>
       <View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10,
-            padding: 10,
-            height: 70,
-            backgroundColor: colors.background,
-            opacity: data?.isExist ? 1 : 0.5,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
-          }}
-          pointerEvents={data?.isExist ? "auto" : "none"}>
-          <Button title="Play" onPress={onPress} color={colors.tint} />
-          <Image style={{ height: "100%", aspectRatio: 1 }} source={data?.albumArt} />
-          <Text style={{ color: colors.text }}>{data?.title ?? ""}</Text>
-        </View>
+        <TouchableOpacity onPress={onPress}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              padding: 10,
+              height: 70,
+              backgroundColor: colors.background,
+              opacity: data?.isExist ? 1 : 0.5,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.border,
+            }}
+            pointerEvents={data?.isExist ? "auto" : "none"}>
+            <Image style={{ height: "100%", aspectRatio: 1 }} source={data?.albumArt} />
+            <Text style={{ color: colors.text }}>{data?.title ?? ""}</Text>
+          </View>
+        </TouchableOpacity>
 
         {!data?.isExist && (
           <View

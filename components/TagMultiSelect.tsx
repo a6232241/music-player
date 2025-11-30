@@ -31,7 +31,7 @@ const TagMultiSelect = ({ selected, onPress }: Props) => {
     <View style={{ gap: 10 }}>
       <TouchableOpacity
         onPress={() => setIsExtends((prev) => !prev)}
-        style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text style={{ fontWeight: "bold", fontSize: 20, color: colors.text }}>標籤</Text>
         <Entypo name={!isExtends ? "chevron-up" : "chevron-down"} size={24} color={colors.text} />
       </TouchableOpacity>

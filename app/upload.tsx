@@ -60,7 +60,7 @@ const UploadScreen = () => {
           const musicId = await Apis.sqlite?.music.postMusic(audioInfo);
           if (!musicId) throw new Error("Failed to post music");
 
-          if (fileInfo.exists) await Apis.file.postFile("assets", fileInfo);
+          await Apis.file.postFile("assets", fileInfo);
 
           if (selectedTagIds.size > 0) {
             Apis.sqlite?.musicTag.postMusicTags({
@@ -88,9 +88,7 @@ const UploadScreen = () => {
 
   return (
     <>
-      <SafeAreaView
-        edges={["left", "right", "bottom"]}
-        style={{ flex: 1, alignItems: "center", backgroundColor: colors.background }}>
+      <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1, backgroundColor: colors.background }}>
         <TagMultiSelect selected={selectedTagIds} onPress={handleSelectTagId} />
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           {isLoading ? <ActivityIndicator size="large" /> : <Button title="Upload" onPress={handleUploadFile} />}

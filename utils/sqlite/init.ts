@@ -3,17 +3,20 @@ import { SQLiteDatabase } from "expo-sqlite";
 export async function migrateDbIfNeeded(db: SQLiteDatabase): Promise<{ isError: boolean }> {
   try {
     const DATABASE_VERSION = 2;
+
+    // Clear all tables
+    // let tables = await db.getAllAsync<{ name: string }>("SELECT name FROM sqlite_master WHERE type='table';");
+    // for (let i = 0; i < tables.length; i++) {
+    //   await db.runAsync(`DROP TABLE IF EXISTS ${tables[i].name}`);
+    // }
+    // await db.execAsync(`PRAGMA user_version = 0`);
+
     const currentDbVersion =
       (await db.getFirstAsync<{ user_version: number }>("PRAGMA user_version"))?.user_version ?? null;
 
     if (currentDbVersion === null || currentDbVersion >= DATABASE_VERSION) {
       return { isError: false };
     }
-    // Clear all tables
-    // let tables = await db.getAllAsync<{ name: string }>("SELECT name FROM sqlite_master WHERE type='table';");
-    // for (let i = 0; i < tables.length; i++) {
-    //   await db.runAsync(`DROP TABLE IF EXISTS ${tables[i].name}`);
-    // }
 
     if (currentDbVersion === 0) {
       await db.execAsync(`
