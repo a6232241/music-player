@@ -68,7 +68,7 @@ const AudioItem: React.FC<Props> = ({ data, onPress, setData, externalProgress, 
             }}
             pointerEvents={data?.isExist ? "auto" : "none"}>
             <Image style={{ height: "100%", aspectRatio: 1 }} source={data?.albumArt} />
-            <Text style={{ color: colors.text }}>{data?.title ?? ""}</Text>
+            <Text style={{ color: colors.text }}>{data?.title ?? data?.fileName.split(".")[0] ?? ""}</Text>
           </View>
         </TouchableOpacity>
 

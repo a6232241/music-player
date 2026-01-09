@@ -203,7 +203,7 @@ export default function Index() {
   );
 
   useEffect(() => {
-    const currentIndex = audioId ? audios.findIndex((audio) => audio.id === audioId) : audios[0]?.id;
+    const currentIndex = audios.findIndex((audio) => audio.id === audioId);
     if (!status.didJustFinish || audios.length === 0 || currentIndex >= audios.length - 1) return;
     handleAudioItemPress(currentIndex + 1);
   }, [status.didJustFinish, handleAudioItemPress, player, audios, audioId]);
