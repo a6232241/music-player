@@ -46,6 +46,10 @@ This skill provides guidelines for creating Conventional Commits messages.
     *   **NEVER** automatically stage unstaged files unless explicitly requested by the user.
     *   **NEVER** commit unstaged files.
 
+6.  **Clean File References**:
+    *   **NEVER** include absolute file paths, file URIs, or editor-specific reference tags (e.g., `(cci:7://file://...)`, `@[/...]`) in the generated commit message.
+    *   Always use clean, relative file paths or simple module/component names to describe the affected files.
+
 ## Workflow
 
 1.  Run `git diff --cached` to analyze **staged** changes.

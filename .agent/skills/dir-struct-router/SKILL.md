@@ -29,4 +29,8 @@ This skill acts as an intelligent router for enforcing directory structure rules
 - **Condition**: If any of the unstaged files fall under the `assets/` directory.
 - **Target Skill**: Read and execute `../enforce-assets-structure/SKILL.md`.
 
-*More routing rules can be added here in the future as the project grows (e.g., hooks, api, components).*
+### 3. Components Structure
+- **Condition**: If any of the unstaged files fall under the `components/` directory.
+- **Target Skill**: Read and execute `../enforce-components-structure/SKILL.md`.
+
+*More routing rules can be added here in the future as the project grows (e.g., hooks, api).*
