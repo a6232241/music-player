@@ -17,10 +17,16 @@ This skill acts as an intelligent router for enforcing directory structure rules
 5. If multiple rules match, execute them sequentially.
 6. If no unstaged files are found, or if none of them match the routing rules, inform the user that all structural checks passed.
 
+**Crucial Note**: All conversations, explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).
+
 ## Routing Rules
 
 ### 1. Screens Structure
 - **Condition**: If any of the unstaged files fall under the `screens/` directory, or if they are in `app/` and appear to contain newly injected UI logic that belongs in `screens/`.
 - **Target Skill**: Read and execute `../enforce-screens-structure/SKILL.md`.
+
+### 2. Assets Structure
+- **Condition**: If any of the unstaged files fall under the `assets/` directory.
+- **Target Skill**: Read and execute `../enforce-assets-structure/SKILL.md`.
 
 *More routing rules can be added here in the future as the project grows (e.g., hooks, api, components).*

@@ -30,6 +30,8 @@ When called by the Directory Structure Router skill, follow these exact steps:
 5. If the user agrees, use the appropriate tools to move/refactor the files. 
 6. If the user disagrees or does not want to apply the changes, end the conversation cleanly and do not force modifications.
 
+**Crucial Note**: All conversations, proposed changes, explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).
+
 ## Helper Scripts
 
 To accurately determine the number of files related to a specific screen, use the `list_dir` tool to count files inside directories such as `screens/<ScreenName>`. 
