@@ -1,4 +1,4 @@
-import { SortType } from "@/components/SortSelect";
+import { SortType } from "@/screens/Home/components/SortSelect";
 import Config from "../Config";
 import {
   GetMusicByTagRequire,
