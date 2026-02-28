@@ -1,12 +1,12 @@
 ---
 name: Directory Structure Router
-description: This skill should be used when the user mentions "dir struct" or asks to route uncommitted files. It reads the local unstaged files and routes matching file paths to the appropriate directory structure enforcement skills.
+description: This skill acts as a structural router. It is executed by the `file-length-enforcer` skill after file size validations are complete. It reads local unstaged files and routes matching file paths to the appropriate directory structure enforcement skills.
 version: 0.1.0
 ---
 
 # Directory Structure Router
 
-This skill acts as an intelligent router for enforcing directory structure rules. When the user says "dir struct", it analyzes the current unstaged changes and decides which specific validation skills to invoke.
+This skill acts as an intelligent router for enforcing directory structure rules. It analyzes the current unstaged changes and decides which specific validation skills to invoke. It should normally be called by the **File Length Enforcer** skill.
 
 ## Execution Workflow
 

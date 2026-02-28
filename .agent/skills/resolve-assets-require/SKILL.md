@@ -16,8 +16,8 @@ This skill acts proactively whenever UI component or standard script files are m
 4. If the required asset exists in `index.ts` already, note its exported key (e.g., `IMAGES.Something`).
 5. If the required asset does not exist, propose a patch to add it to `assets/index.ts` under the correct category (`ICONS`, `IMAGES`, or `BRAND`).
 6. Suggest modifying the target UI file to `import { [Category] } from '@/assets'` (or relative equivalent) and replacing the `require` or `import` with the extracted key `[Category].[AssetKey]`.
-7. Present the proposed modifications to the user. You **must not** apply them without explicit approval.
+7. Present the proposed modifications to the user. **You must construct a planning table (規劃表) summarizing these modifications.** You **must not** apply them without explicit approval.
 8. If the user agrees, run the file edit tools to update `index.ts` and the UI file(s).
 9. If no invalid requires are found, simply report that checks passed.
 
-**Crucial Note**: All conversations, proposed changes, explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).
+**Crucial Note**: All conversations, proposed changes, planning tables (規劃表), explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).

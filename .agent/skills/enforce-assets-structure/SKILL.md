@@ -50,8 +50,8 @@ When called by the Directory Structure Router skill, follow these exact steps:
 2. Check if the files are correctly placed within `brand/`, `icons/`, `images/`, or `fonts/`. If a file is flat in `assets/`, propose moving it.
 3. Check `assets/index.ts`. If the new asset is not exported in this index, propose adding an export for it under `ICONS`, `IMAGES`, or `BRAND`.
 5. Warn the user gently if the filenames blatantly violate the naming convention guidelines, but clarify that renaming is optional.
-6. Present the proposed changes (file moves and `index.ts` modifications) to the user. Do **not** apply them immediately.
+6. Present the proposed changes (file moves and `index.ts` modifications) to the user. **You must construct a planning table (規劃表) summarizing these changes.** Do **not** apply them immediately.
 7. If the user agrees, use the appropriate tools to move files and edit `index.ts`.
 8. If the user disagrees or does not want to apply the changes, end the conversation cleanly.
 
-**Crucial Note**: All conversations, proposed changes, explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).
+**Crucial Note**: All conversations, proposed changes, planning tables (規劃表), explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).

@@ -26,11 +26,11 @@ When called by the Directory Structure Router skill, follow these exact steps:
 1. Use the `run_command` tool to run `git status -u` to identify all unstaged or modified files.
 2. Analyze the modified or added files related to screens (`app/`, `screens/`, `components/` targeted for single screens).
 3. Evaluate if any screen is violating the scale rules (e.g., flat files in `screens/` getting too large, or complex logic left in `app/`).
-4. Propose necessary file moves or creations to the user based on the rules. Do **not** apply them immediately. Let the user know the proposed changes and wait for approval.
+4. Propose necessary file moves or creations to the user based on the rules. **You must construct a planning table (規劃表) summarizing the proposed changes.** Do **not** apply them immediately. Let the user know the proposed changes and wait for approval.
 5. If the user agrees, use the appropriate tools to move/refactor the files. 
 6. If the user disagrees or does not want to apply the changes, end the conversation cleanly and do not force modifications.
 
-**Crucial Note**: All conversations, proposed changes, explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).
+**Crucial Note**: All conversations, proposed changes, planning tables (規劃表), explanations, and responses to the user MUST be in Traditional Chinese (繁體中文).
 
 ## Helper Scripts
 
