@@ -1,6 +1,6 @@
 ---
 name: Directory Structure Router
-description: This skill acts as a structural router. It is executed by the `file-length-enforcer` skill after file size validations are complete. It reads local unstaged files and routes matching file paths to the appropriate directory structure enforcement skills.
+description: This skill acts as a structural router. It is executed by the `file-length-enforcer` skill after file size validations are complete. It reads local unstaged and non-deleted files and routes matching file paths to the appropriate directory structure enforcement skills.
 version: 0.1.0
 ---
 
@@ -10,7 +10,7 @@ This skill acts as an intelligent router for enforcing directory structure rules
 
 ## Execution Workflow
 
-1. Use the `run_command` tool to run `git status -s` (or `git status -u`) to identify all unstaged, modified, or added files in the repository.
+1. Use the `run_command` tool to run `git status -s` (or `git status -u`) to identify all unstaged, modified, or added (but not deleted) files in the repository.
 2. Group the modified files by their root directories.
 3. Compare the changed files against known routing rules below.
 4. If a matched rule exists, read the corresponding SKILL file using the `view_file` tool and proceed with its validation workflow.
@@ -33,4 +33,8 @@ This skill acts as an intelligent router for enforcing directory structure rules
 - **Condition**: If any of the unstaged files fall under the `components/` directory.
 - **Target Skill**: Read and execute `../enforce-components-structure/SKILL.md`.
 
-*More routing rules can be added here in the future as the project grows (e.g., hooks, api).*
+### 4. Services Structure
+- **Condition**: If any unstaged files fall under the `services/` directory, or if there are modified unstructured files (such as `utils/Apis/`) that handle networking, databases, storage, etc.
+- **Target Skill**: Read and execute `../enforce-services-structure/SKILL.md`.
+
+*More routing rules can be added here in the future as the project grows (e.g., hooks).*

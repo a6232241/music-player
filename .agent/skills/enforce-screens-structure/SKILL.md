@@ -1,12 +1,12 @@
 ---
 name: Enforce Screens Directory Structure
-description: This skill enforces the screens directory structure. It is meant to be called by the `dir-struct-router` skill when unstaged files exist in the `screens` directory. It checks unstaged files to ensure that any new or modified screen components adhere to the project's folder scale rule.
+description: This skill enforces the screens directory structure. It is meant to be called by the `dir-struct-router` skill when unstaged and non-deleted files exist in the `screens` directory. It checks unstaged and non-deleted files to ensure that any new or modified screen components adhere to the project's folder scale rule.
 version: 0.1.0
 ---
 
 # Enforce Screens Directory Structure
 
-This skill ensures that all UI code adheres to the project's `screens/` directory structure rules before changes are staged for commit. It is executed automatically by the **Directory Structure Router** skill when there are unstaged files related to the UI.
+This skill ensures that all UI code adheres to the project's `screens/` directory structure rules before changes are staged for commit. It is executed automatically by the **Directory Structure Router** skill when there are unstaged and non-deleted files related to the UI.
 
 ## Directory Structure Rules
 

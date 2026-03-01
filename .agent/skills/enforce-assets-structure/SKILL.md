@@ -1,12 +1,12 @@
 ---
 name: Enforce Assets Directory Structure
-description: This skill enforces the project's assets directory structure and naming conventions. It is called by the `dir-struct-router` skill when unstaged files exist in the `assets/` directory.
+description: This skill enforces the project's assets directory structure and naming conventions. It is called by the `dir-struct-router` skill when unstaged and non-deleted files exist in the `assets/` directory.
 version: 0.1.0
 ---
 
 # Enforce Assets Directory Structure
 
-This skill ensures that all assets adhere to the project's `assets/` directory structure and naming conventions before changes are staged for commit. It is executed automatically by the **Directory Structure Router** skill when there are unstaged files related to assets.
+This skill ensures that all assets adhere to the project's `assets/` directory structure and naming conventions before changes are staged for commit. It is executed automatically by the **Directory Structure Router** skill when there are unstaged and non-deleted files related to assets.
 
 ## Directory Structure Rules
 

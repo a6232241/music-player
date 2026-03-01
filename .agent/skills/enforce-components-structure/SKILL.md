@@ -1,12 +1,12 @@
 ---
 name: Enforce Components Directory Structure
-description: This skill enforces the project's global components directory structure. It is called by the `dir-struct-router` skill when unstaged files exist in the `components/` directory.
+description: This skill enforces the project's global components directory structure. It is called by the `dir-struct-router` skill when unstaged and non-deleted files exist in the `components/` directory.
 version: 0.1.0
 ---
 
 # Enforce Components Directory Structure
 
-This skill ensures that all UI code adheres to the project's global `components/` directory structure rules before changes are staged for commit. It must **only** inspect unstaged files.
+This skill ensures that all UI code adheres to the project's global `components/` directory structure rules before changes are staged for commit. It must **only** inspect unstaged and non-deleted files.
 
 ## Directory Structure Rules
 

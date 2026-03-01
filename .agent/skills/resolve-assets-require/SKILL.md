@@ -10,7 +10,7 @@ This skill acts proactively whenever UI component or standard script files are m
 
 ## Execution Workflow
 
-1. For any modified application code file (`.tsx`, `.jsx`, `.ts`, `.js`), check for occurrences of direct asset requirements (e.g., `require('../../assets/images/something.png')` or `import img from '../../assets/images/something.png'`).
+1. For any modified (and not deleted) application code file (`.tsx`, `.jsx`, `.ts`, `.js`), check for occurrences of direct asset requirements (e.g., `require('../../assets/images/something.png')` or `import img from '../../assets/images/something.png'`).
 2. If direct queries are found, determine the path of the specific asset.
 3. Read the `assets/index.ts` file. 
 4. If the required asset exists in `index.ts` already, note its exported key (e.g., `IMAGES.Something`).
