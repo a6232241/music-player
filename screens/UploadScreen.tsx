@@ -1,8 +1,8 @@
 import TagMultiSelect from "@/components/TagMultiSelect";
 import { useTheme } from "@/context/ThemeContext";
-import Apis from "@/utils/Apis";
-import { PostMusicRequire } from "@/utils/Apis/Sqlite/Music/type";
-import { getMetadataFromUri } from "@/utils/helper";
+import Apis from "@/services";
+import { PostMusicRequire } from "@/services/database/repositories/Music/type";
+import { getMetadataFromUri } from "@/services/system/fileService";
 import { Buffer } from "buffer";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";

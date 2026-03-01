@@ -1,5 +1,5 @@
-import Apis from "@/utils/Apis";
-import { getDocumentFile } from "@/utils/helper";
+import Apis from "@/services";
+import { getDocumentFile } from "@/services/system/fileService";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useFocusEffect } from "expo-router";
 import { ComponentProps, useCallback, useEffect, useMemo, useState } from "react";

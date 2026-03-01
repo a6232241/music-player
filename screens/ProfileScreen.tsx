@@ -1,6 +1,7 @@
 import { useTheme } from "@/context/ThemeContext";
-import Apis from "@/utils/Apis";
-import { checkpointSqliteDB, getDocumentFile, verifySqliteDB } from "@/utils/helper";
+import Apis from "@/services";
+import { checkpointSqliteDB, verifySqliteDB } from "@/services/database/maintenance";
+import { getDocumentFile } from "@/services/system/fileService";
 import * as FileSystem from "expo-file-system";
 import { Link } from "expo-router";
 import { Alert, Text, TouchableOpacity } from "react-native";

@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
-import { migrateDbIfNeeded } from "../sqlite/init";
-import File from "./File";
-import Sqlite from "./Sqlite";
+import File from "./api/file";
+import { migrateDbIfNeeded } from "./database/client";
+import Sqlite from "./database/repositories";
 
 class Apis {
   private db: SQLite.SQLiteDatabase | null = null;

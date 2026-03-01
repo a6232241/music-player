@@ -1,6 +1,6 @@
 import { useTheme } from "@/context/ThemeContext";
-import Apis from "@/utils/Apis";
-import { GetTagGenreIncludeTagsResponse } from "@/utils/Apis/Sqlite/TagGenre/type";
+import Apis from "@/services";
+import { GetTagGenreIncludeTagsResponse } from "@/services/database/repositories/TagGenre/type";
 import { Entypo } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";

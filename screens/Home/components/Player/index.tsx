@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { MusicType } from "@/utils/Apis/Sqlite/Music/type";
+import { MusicType } from "@/services/database/repositories/Music/type";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";

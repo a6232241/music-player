@@ -1,6 +1,17 @@
 import * as FileSystem from "expo-file-system";
-import { GetMusicResponse } from "../Sqlite/Music/type";
-import { DownloadProgress, DownloadResult } from "./type";
+import { GetMusicResponse } from "../database/repositories/Music/type";
+
+export type DownloadProgress = {
+  totalBytesWritten: number;
+  totalBytesExpectedToWrite: number;
+  progress: number;
+};
+
+export type DownloadResult = {
+  success: boolean;
+  fileName: string;
+  error?: string;
+};
 
 class File {
   origin: string;

@@ -1,7 +1,7 @@
 import { useTheme } from "@/context/ThemeContext";
-import Apis from "@/utils/Apis";
-import { DownloadProgress } from "@/utils/Apis/File/type";
-import { GetMusicResponse } from "@/utils/Apis/Sqlite/Music/type";
+import Apis from "@/services";
+import { DownloadProgress } from "@/services/api/file";
+import { GetMusicResponse } from "@/services/database/repositories/Music/type";
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, Button, Text, TouchableOpacity, View } from "react-native";

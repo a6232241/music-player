@@ -1,6 +1,6 @@
 import ThemeToggle from "@/components/ThemeToggle";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
-import Apis from "@/utils/Apis";
+import Apis from "@/services";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import * as FileSystem from "expo-file-system";

@@ -1,5 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
-import { MusicType } from "@/utils/Apis/Sqlite/Music/type";
+import { MusicType } from "@/services/database/repositories/Music/type";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
